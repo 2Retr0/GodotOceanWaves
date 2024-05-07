@@ -1,0 +1,39 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="OceanWaves"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.2", "Forward Plus")
+boot_splash/show_image=false
+config/icon="res://icon.svg"
+
+[autoload]
+
+DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
+
+[display]
+
+window/size/viewport_width=1440
+window/size/viewport_height=810
+window/stretch/mode="canvas_items"
+window/vsync/vsync_mode=3
+window/quality/msaa_2d=0
+window/quality/msaa_3d=1
+window/show_image=false
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=1

@@ -1,0 +1,401 @@
+[gd_scene load_steps=3 format=3 uid="uid://cggqb75a8w8r"]
+
+[ext_resource type="Script" path="res://addons/debug_menu/debug_menu.gd" id="1_p440y"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ki0n8"]
+bg_color = Color(0, 0, 0, 0.25098)
+
+[node name="CanvasLayer" type="CanvasLayer" node_paths=PackedStringArray("fps", "frame_time", "frame_number", "frame_history_total_avg", "frame_history_total_min", "frame_history_total_max", "frame_history_total_last", "frame_history_cpu_avg", "frame_history_cpu_min", "frame_history_cpu_max", "frame_history_cpu_last", "frame_history_gpu_avg", "frame_history_gpu_min", "frame_history_gpu_max", "frame_history_gpu_last", "fps_graph", "total_graph", "cpu_graph", "gpu_graph", "information", "settings")]
+layer = 128
+script = ExtResource("1_p440y")
+fps = NodePath("DebugMenu/VBoxContainer/FPS")
+frame_time = NodePath("DebugMenu/VBoxContainer/FrameTime")
+frame_number = NodePath("DebugMenu/VBoxContainer/FrameNumber")
+frame_history_total_avg = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/TotalAvg")
+frame_history_total_min = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/TotalMin")
+frame_history_total_max = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/TotalMax")
+frame_history_total_last = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/TotalLast")
+frame_history_cpu_avg = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/CPUAvg")
+frame_history_cpu_min = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/CPUMin")
+frame_history_cpu_max = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/CPUMax")
+frame_history_cpu_last = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/CPULast")
+frame_history_gpu_avg = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/GPUAvg")
+frame_history_gpu_min = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/GPUMin")
+frame_history_gpu_max = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/GPUMax")
+frame_history_gpu_last = NodePath("DebugMenu/VBoxContainer/FrameTimeHistory/GPULast")
+fps_graph = NodePath("DebugMenu/VBoxContainer/FPSGraph/Graph")
+total_graph = NodePath("DebugMenu/VBoxContainer/TotalGraph/Graph")
+cpu_graph = NodePath("DebugMenu/VBoxContainer/CPUGraph/Graph")
+gpu_graph = NodePath("DebugMenu/VBoxContainer/GPUGraph/Graph")
+information = NodePath("DebugMenu/VBoxContainer/Information")
+settings = NodePath("DebugMenu/VBoxContainer/Settings")
+
+[node name="DebugMenu" type="Control" parent="."]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -416.0
+offset_top = 8.0
+offset_right = -16.0
+offset_bottom = 408.0
+grow_horizontal = 0
+size_flags_horizontal = 8
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DebugMenu"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -300.0
+offset_bottom = 374.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="FPS" type="Label" parent="DebugMenu/VBoxContainer"]
+modulate = Color(0, 1, 0, 1)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/line_spacing = 0
+theme_override_font_sizes/font_size = 27
+text = "60 FPS"
+horizontal_alignment = 2
+
+[node name="FrameTime" type="Label" parent="DebugMenu/VBoxContainer"]
+modulate = Color(0, 1, 0, 1)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "16.67 mspf (cap: 123 FPS + Adaptive V-Sync)"
+horizontal_alignment = 2
+
+[node name="FrameNumber" type="Label" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Frame: 1234"
+horizontal_alignment = 2
+
+[node name="FrameTimeHistory" type="GridContainer" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 5
+
+[node name="Spacer" type="Control" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AvgHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Average"
+horizontal_alignment = 2
+
+[node name="MinHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Best"
+horizontal_alignment = 2
+
+[node name="MaxHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Worst"
+horizontal_alignment = 2
+
+[node name="LastHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Last"
+horizontal_alignment = 2
+
+[node name="TotalHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Total:"
+horizontal_alignment = 2
+
+[node name="TotalAvg" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="TotalMin" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="TotalMax" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="TotalLast" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="CPUHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "CPU:"
+horizontal_alignment = 2
+
+[node name="CPUAvg" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="CPUMin" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "12.34"
+horizontal_alignment = 2
+
+[node name="CPUMax" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="CPULast" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="GPUHeader" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "GPU:"
+horizontal_alignment = 2
+
+[node name="GPUAvg" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="GPUMin" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "1.23"
+horizontal_alignment = 2
+
+[node name="GPUMax" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="GPULast" type="Label" parent="DebugMenu/VBoxContainer/FrameTimeHistory"]
+modulate = Color(0, 1, 0, 1)
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "123.45"
+horizontal_alignment = 2
+
+[node name="FPSGraph" type="HBoxContainer" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="Title" type="Label" parent="DebugMenu/VBoxContainer/FPSGraph"]
+custom_minimum_size = Vector2(0, 27)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "FPS: ↑"
+vertical_alignment = 1
+
+[node name="Graph" type="Panel" parent="DebugMenu/VBoxContainer/FPSGraph"]
+custom_minimum_size = Vector2(150, 25)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ki0n8")
+
+[node name="TotalGraph" type="HBoxContainer" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="Title" type="Label" parent="DebugMenu/VBoxContainer/TotalGraph"]
+custom_minimum_size = Vector2(0, 27)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Total: ↓"
+vertical_alignment = 1
+
+[node name="Graph" type="Panel" parent="DebugMenu/VBoxContainer/TotalGraph"]
+custom_minimum_size = Vector2(150, 25)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ki0n8")
+
+[node name="CPUGraph" type="HBoxContainer" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="Title" type="Label" parent="DebugMenu/VBoxContainer/CPUGraph"]
+custom_minimum_size = Vector2(0, 27)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "CPU: ↓"
+vertical_alignment = 1
+
+[node name="Graph" type="Panel" parent="DebugMenu/VBoxContainer/CPUGraph"]
+custom_minimum_size = Vector2(150, 25)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ki0n8")
+
+[node name="GPUGraph" type="HBoxContainer" parent="DebugMenu/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 2
+
+[node name="Title" type="Label" parent="DebugMenu/VBoxContainer/GPUGraph"]
+custom_minimum_size = Vector2(0, 27)
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "GPU: ↓"
+vertical_alignment = 1
+
+[node name="Graph" type="Panel" parent="DebugMenu/VBoxContainer/GPUGraph"]
+custom_minimum_size = Vector2(150, 25)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ki0n8")
+
+[node name="Information" type="Label" parent="DebugMenu/VBoxContainer"]
+modulate = Color(1, 1, 1, 0.752941)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "12th Gen Intel(R) Core(TM) i0-1234K
+Windows 12 64-bit (double precision), Vulkan 1.2.34
+NVIDIA GeForce RTX 1234, 123.45.67"
+horizontal_alignment = 2
+
+[node name="Settings" type="Label" parent="DebugMenu/VBoxContainer"]
+modulate = Color(0.8, 0.84, 1, 0.752941)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+text = "Project Version: 1.2.3
+Rendering Method: Forward+
+Window: 1234×567, Viewport: 1234×567
+3D Scale (FSR 1.0): 100% = 1234×567
+3D Antialiasing: TAA + 2× MSAA + FXAA
+SSR: 123 Steps
+SSAO: On
+SSIL: On
+SDFGI: 1 Cascades
+Glow: On
+Volumetric Fog: On
+2D Antialiasing: 2× MSAA"
+horizontal_alignment = 2
+
+[connection signal="visibility_changed" from="." to="." method="_on_visibility_changed"]
