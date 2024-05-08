@@ -1,5 +1,12 @@
 #[compute]
 #version 460
+/** Modulates the JONSWAP wave spectra texture in time and calculates
+  * its gradients. Since the outputs are all real-valued, they are packed
+  * in pairs.
+  * 
+  * Sources: Jerry Tessendorf - Simulating Ocean Water
+  *          Robert Matusiak - Implementing Fast Fourier Transform Algorithms of Real-Valued Sequences With the TMS320 DSP Platform
+  */
 
 #define TAU        (6.283185307179586)
 #define EPSILON    (1e-10)
@@ -9,13 +16,12 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(rgba16f, binding = 0) restrict readonly uniform image2D spectrum;
-layout(std430, binding = 1) restrict writeonly buffer FFTBuffer {
+layout(std430, set = 0, binding = 0) restrict writeonly buffer FFTBuffer {
 	vec4 butterfly[NUM_STAGES][MAP_SIZE];
 	vec2 data[2][4][MAP_SIZE][MAP_SIZE];
 } fft_buffer;
-layout(rgba16f, binding = 2) restrict readonly uniform image2D displacement_map;
-layout(rgba16f, binding = 3) restrict readonly uniform image2D normal_map;
+
+layout(rgba16f, set = 1, binding = 0) restrict readonly uniform image2D spectrum;
 
 layout(push_constant) restrict readonly uniform PushConstants {
 	vec2 tile_length;
@@ -38,7 +44,7 @@ vec2 conj_complex(in vec2 x) {
 	return x;
 }
 
-// Source: Simulating Ocean Water - Jerry Tessendorf
+// Jerry Tessendorf - Source: Simulating Ocean Water
 float dispertion_relation(in float k) {
 	// Assumption: Depth is infinite
 	return sqrt(G*k); // sqrt(g*k*tanh(k*depth))
@@ -56,6 +62,7 @@ void main() {
 	vec4 h0 = imageLoad(spectrum, id); // xy=h0(k), zw=conj(h0(-k)
 
 	vec2 modulation = exp_complex(dispertion_relation(k) * params.time);
+	// Note: h respects the complex conjugation property
 	vec2 h = mul_complex(h0.xy, modulation) + mul_complex(h0.zw, conj_complex(modulation));
 	vec2 h_inv = vec2(-h.y, h.x); // Used to simplify complex multiplication operations
 
@@ -71,6 +78,8 @@ void main() {
 	vec2 dhz_dz = -h * k_vec.y * k_unit.y; // Equivalent: mul_complex(vec2(k_vec.y * k_unit.y, 0), -h);
 	vec2 dhz_dx = -h * k_vec.x * k_unit.y; // Equivalent: mul_complex(vec2(k_vec.x * k_unit.y, 0), -h);
 
+	// Because h repsects the complex conjugation property (i.e., the output of IFFT will be a
+	// real signal), we can pack two waves into one.
 	fft_buffer.data[0][0][id.y][id.x] = vec2(    hx.x -     hy.y,     hx.y +     hy.x);	
 	fft_buffer.data[0][1][id.y][id.x] = vec2(    hz.x - dhy_dx.y,     hz.y + dhy_dx.x);
 	fft_buffer.data[0][2][id.y][id.x] = vec2(dhy_dz.x - dhx_dx.y, dhy_dz.y + dhx_dx.x);

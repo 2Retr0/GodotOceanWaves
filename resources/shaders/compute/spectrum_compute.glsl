@@ -1,5 +1,11 @@
 #[compute]
 #version 460
+/** Generates a 2D texture representing the JONSWAP wave spectra
+  * w/ Hasselmann directional spreading.
+  *
+  * Sources: Jerry Tessendorf - Simulating Ocean Water
+  *          Christopher J. Horvath - Empirical Directional Wave Spectra for Computer Graphics
+  */
 
 #define TAU        (6.283185307179586)
 #define EPSILON    (1e-10)
@@ -9,12 +15,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(rgba16f, binding = 0) restrict writeonly uniform image2D spectrum;
-layout(std430, binding = 1) restrict writeonly buffer FFTBuffer {
-	float data[];
-} fft_buffer;
-layout(rgba16f, binding = 2) restrict readonly uniform image2D displacement_map;
-layout(rgba16f, binding = 3) restrict readonly uniform image2D normal_map;
+layout(rgba16f, set = 0, binding = 0) restrict writeonly uniform image2D spectrum;
 
 layout(push_constant) restrict readonly uniform PushConstants {
 	vec2 tile_length;
@@ -62,7 +63,7 @@ vec2 conj_complex(in vec2 x) {
 }
 
 // --- SPECTRUM-RELATED FUNCTIONS ---
-// Source: Simulating Ocean Water - Jerry Tessendorf
+// Source: Jerry Tessendorf - Simulating Ocean Water
 float dispertion_relation(in float k) {
 	// Assumption: Depth is infinite
 	return sqrt(G*k); // sqrt(g*k*tanh(k*depth))
@@ -73,7 +74,7 @@ float d_dispertion_relation(in float k) {
 	return G / (2.0*sqrt(G*k));
 }
 
-// Source: Empirical Directional Wave Spectra for Computer Graphics
+// Source: Christopher J. Horvath - Empirical Directional Wave Spectra for Computer Graphics
 float hasselmann_directional_spread(in float w, in float w_p, in float wind_speed, in float theta) {
 	float p = w / w_p;
     float s = (w <= w_p) ? 6.97*pow(p, 4.06) : 9.77*pow(p, -2.33 - 1.45*(wind_speed*w_p/G - 1.17));
@@ -116,5 +117,6 @@ void main() {
 	const ivec2 id0 = ivec2(gl_GlobalInvocationID.xy);
 	const ivec2 id1 = ivec2(mod(-id0, MAP_SIZE));
 
+	// We pack the spectra at both k and -k for use in the modulation stage
 	imageStore(spectrum, id0, vec4(get_spectrum_amplitude(id0), conj_complex(get_spectrum_amplitude(id1))));
 }

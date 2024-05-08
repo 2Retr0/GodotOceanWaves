@@ -1,5 +1,6 @@
 #[compute]
 #version 460
+/** Precomputes the butterfly factors for a Stockham FFT kernel */
 
 #define PI         (3.141592653589793)
 #define NUM_STAGES (8U) // log2(MAP_SIZE)
@@ -7,13 +8,10 @@
 
 layout(local_size_x = 1, local_size_y = 64, local_size_z = 1) in;
 
-layout(rgba16f, binding = 0) restrict readonly uniform image2D spectrum;
-layout(std430, binding = 1) restrict buffer FFTBuffer {
+layout(std430, set = 0, binding = 0) restrict writeonly buffer FFTBuffer {
 	vec4 butterfly[NUM_STAGES][MAP_SIZE];
 	float data[];
 } fft_buffer;
-layout(rgba16f, binding = 2) restrict readonly uniform image2D displacement_map;
-layout(rgba16f, binding = 3) restrict readonly uniform image2D normal_map;
 
 /** Returns exp(j*x) assuming x >= 0. */
 vec2 exp_complex(in float x) {

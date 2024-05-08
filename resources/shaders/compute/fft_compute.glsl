@@ -1,5 +1,6 @@
 #[compute]
 #version 460
+/** A coalesced Stockham FFT kernel. */
 
 #define PI         (3.141592653589793)
 #define TAU        (6.283185307179586)
@@ -8,13 +9,10 @@
 
 layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
 
-layout(rgba16f, binding = 0) restrict readonly uniform image2D spectrum;
-layout(std430, binding = 1) restrict buffer FFTBuffer {
+layout(std430, set = 0, binding = 0) restrict buffer FFTBuffer {
 	vec4 butterfly[NUM_STAGES][MAP_SIZE];
 	vec2 data[2][4][MAP_SIZE][MAP_SIZE];
 } fft_buffer;
-layout(rgba16f, binding = 2) restrict readonly uniform image2D displacement_map;
-layout(rgba16f, binding = 3) restrict readonly uniform image2D normal_map;
 
 shared vec2 row_shared[2][MAP_SIZE]; // "Ping-pong" shared buffer for a single row
 
