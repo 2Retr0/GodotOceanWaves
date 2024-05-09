@@ -8,27 +8,37 @@ var pipelines : Dictionary
 var descriptors : Dictionary
 var descriptor_sets : Dictionary
 
-var displacement_map_image := Image.create(256, 256, false, Image.FORMAT_RGBAH)
-var normal_map_image := Image.create(256, 256, false, Image.FORMAT_RGBAH)
-
-### Size of tile heightmap should cover (in meters)
-@export var tile_length := Vector2(50, 50) :
-	set(value): tile_length = value; generate_spectrum()
-
-@export var wind_speed := 20.0 :
-	set(value): wind_speed = value; generate_spectrum()
-	
-### Distance from shoreline (in kilometers)
-@export var fetch_length := 550.0 :
-	set(value): fetch_length = value; generate_spectrum()
-	
-@export var scale := 50.0
-
 var num_stages := 8
 var map_size := 256 : 
 	set(value):
 		map_size = value
 		num_stages = int(log(map_size) / log(2))
+
+var displacement_map_image := Image.create(map_size, map_size, false, Image.FORMAT_RGBAH)
+var normal_map_image := Image.create(map_size, map_size, false, Image.FORMAT_RGBAH)
+
+@export_category("Wave Spectrum Parameters")
+## Size of tile heightmap should cover (in meters)
+@export var tile_length := Vector2(50, 50) :
+	set(value): tile_length = value; generate_spectrum()
+@export var wind_speed := 20.0 :
+	set(value): wind_speed = value; generate_spectrum()
+## Distance from shoreline (in kilometers)
+@export var fetch_length := 550.0 :
+	set(value): fetch_length = value; generate_spectrum()
+@export var depth := 20.0 :
+	set(value): depth = value; generate_spectrum()
+@export_range(0, 5) var swell := 1.0 :
+	set(value): swell = value; generate_spectrum()
+## Rotational offset of the spectrum (in degrees)
+@export_range(0, 360) var angle := 0.0 :
+	set(value): angle = value; generate_spectrum()
+@export_range(0, 2) var time_scale := 1.0
+	
+@export_category("Water Shader Parameters")
+## The horizontal scaling of the displacement/normal maps
+@export_range(0, 5) var tile_scale := 1.0
+@export_range(0, 1) var foam_contribution := 1.0
 
 func init_gpu() -> void:
 	# --- DEVICE/SHADER CREATION ---
@@ -42,7 +52,7 @@ func init_gpu() -> void:
 	
 	# --- DESCRIPTOR PREPARATION ---
 	descriptors['spectrum_texture'] = context.create_texture(RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT, RenderingDevice.TEXTURE_USAGE_STORAGE_BIT)
-	# Butterfly texture (FFT stages * map size * sizeof(vec4)) + FFT buffer (map size^2 * 4 FFTs * 2 temp buffers * sizeof(vec2))
+	# Buffer Size Explainiation: Butterfly texture->(#FFT stages * map size * sizeof(vec4)) + FFT buffer->(map size^2 * 4 FFTs * 2 temp buffers (for Stockham FFT) * sizeof(vec2))
 	descriptors['fft_buffer']       = context.create_storage_buffer((num_stages*map_size)*(4*4) + (map_size*map_size)*4*2*(4*2))
 	descriptors['displacement_map'] = context.create_texture(RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT)
 	descriptors['normal_map']       = context.create_texture(RenderingDevice.DATA_FORMAT_R16G16B16A16_SFLOAT)
@@ -70,8 +80,10 @@ func generate_spectrum() -> void:
 	var alpha := JONSWAP_alpha(wind_speed, fetch_length*1e3)
 	var omega := JONSWAP_peak_angular_frequency(wind_speed, fetch_length*1e3)
 	
+	# We precompute the initial spectrum (i.e., t=0) as well as the FFT butterfly
+	# factors only when needed.
 	var compute_list := context.compute_list_begin()
-	pipelines['spectrum_compute'].call(context, compute_list, [tile_length.x, tile_length.y, alpha, omega, wind_speed])
+	pipelines['spectrum_compute'].call(context, compute_list, [tile_length.x, tile_length.y, alpha, omega, wind_speed, depth, swell, deg_to_rad(angle)])
 	pipelines['fft_butterfly'].call(context, compute_list)
 	context.compute_list_end()
 	
@@ -82,18 +94,17 @@ func generate_spectrum() -> void:
 func generate_maps() -> void:
 	if context.needs_sync: 
 		context.sync()
-		displacement_map_image.set_data(256, 256, false, Image.FORMAT_RGBAH, context.device.texture_get_data(descriptors['displacement_map'].rid, 0))
-		normal_map_image.set_data(256, 256, false, Image.FORMAT_RGBAH, context.device.texture_get_data(descriptors['normal_map'].rid, 0))
+		displacement_map_image.set_data(map_size, map_size, false, Image.FORMAT_RGBAH, context.device.texture_get_data(descriptors['displacement_map'].rid, 0))
+		normal_map_image.set_data(map_size, map_size, false, Image.FORMAT_RGBAH, context.device.texture_get_data(descriptors['normal_map'].rid, 0))
 
 	var compute_list := context.compute_list_begin()
-	pipelines['spectrum_modulate'].call(context, compute_list, [tile_length.x, tile_length.y, Time.get_ticks_msec() * 1e-3])
+	pipelines['spectrum_modulate'].call(context, compute_list, [tile_length.x, tile_length.y, depth, Time.get_ticks_msec() * 1e-3 * time_scale])
 	pipelines['fft_compute'].call(context, compute_list)
 	pipelines['transpose'].call(context, compute_list)
 	pipelines['fft_compute'].call(context, compute_list)
 	# Note: We need not do a second transpose here since rotating the wave by pi/2 doesn't affect it visually.
 	pipelines['fft_unpack'].call(context, compute_list)
 	context.compute_list_end()
-
 	context.submit()
 
 # Source: https://wikiwaves.org/Ocean-Wave_Spectra#JONSWAP_Spectrum

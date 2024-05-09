@@ -8,7 +8,7 @@
   *          Robert Matusiak - Implementing Fast Fourier Transform Algorithms of Real-Valued Sequences With the TMS320 DSP Platform
   */
 
-#define TAU        (6.283185307179586)
+#define PI         (3.141592653589793)
 #define EPSILON    (1e-10)
 #define G          (9.81)
 #define MAP_SIZE   (256U)
@@ -25,6 +25,7 @@ layout(rgba16f, set = 1, binding = 0) restrict readonly uniform image2D spectrum
 
 layout(push_constant) restrict readonly uniform PushConstants {
 	vec2 tile_length;
+	float depth;
 	float time;
 } params;
 
@@ -46,15 +47,14 @@ vec2 conj_complex(in vec2 x) {
 
 // Jerry Tessendorf - Source: Simulating Ocean Water
 float dispertion_relation(in float k) {
-	// Assumption: Depth is infinite
-	return sqrt(G*k); // sqrt(g*k*tanh(k*depth))
+	return sqrt(G*k*tanh(k*params.depth + 1e-6));
 }
 
 void main() {
 	const ivec2 dims = imageSize(spectrum);
 	const ivec2 id = ivec2(gl_GlobalInvocationID.xy);
 
-	vec2 k_vec = (id - dims*0.5)*(TAU / params.tile_length); // Wave direction
+	vec2 k_vec = (id - dims*0.5)*(2.0*PI / params.tile_length); // Wave direction
 	float k = length(k_vec) + EPSILON;
 	vec2 k_unit = k_vec / k;
 

@@ -47,14 +47,15 @@ void main() {
 
 			float foam_threshold = 0.0;
 			float foam_bias = 0.5;
-			float foam_decay = 0.05;
-			float foam_add = 1.0;
+			float foam_decay = 0.015;
+			float foam_add = 0.1;
 
 			float jacobian = (1.0 + dhx_dx) * (1.0 + dhz_dz) - dhz_dx*dhz_dx;
 			float biased_jacobian = -min(0, jacobian - foam_bias);
 			float foam = imageLoad(normal_map, id).a;
 			foam *= exp(-foam_decay);
 			foam += biased_jacobian * foam_add;
+			foam = clamp(foam, 0.0, 1.0);
 
 			vec2 gradient = vec2(dhy_dx, dhy_dz) / (1.0 + abs(vec2(dhx_dx, dhz_dz)));
 			imageStore(normal_map, id, vec4(gradient, dhx_dx, foam));

@@ -1,5 +1,5 @@
 class_name RenderingContext extends Object
-### A wrapper around [RenderingDevice] that handles basic memory management/allocation 
+## A wrapper around [RenderingDevice] that handles basic memory management/allocation 
 
 class DeletionQueue:
 	var queue : Array[RID] = []
@@ -46,7 +46,7 @@ func compute_list_begin() -> int: return device.compute_list_begin()
 func compute_list_end() -> void: device.compute_list_end()
 
 # --- HELPER FUNCTIONS ---
-### Loads and compiles a [code].glsl[/code] compute shader.
+## Loads and compiles a [code].glsl[/code] compute shader.
 func load_shader(path : String) -> RID:
 	var shader_spirv : RDShaderSPIRV = load(path).get_spirv()
 	return deletion_queue.push(device.shader_create_from_spirv(shader_spirv))
@@ -62,8 +62,8 @@ func create_texture(format : RenderingDevice.DataFormat, usage : RenderingDevice
 	texture_format.usage_bits = usage # Default: TEXTURE_USAGE_STORAGE_BIT | TEXTURE_USAGE_CPU_READ_BIT | TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	return Descriptor.new(deletion_queue.push(device.texture_create(texture_format, view, data)), RenderingDevice.UNIFORM_TYPE_IMAGE)
 
-### Creates a descriptor set. The ordering of the provided descriptors matches the binding ordering
-### within the shader.
+## Creates a descriptor set. The ordering of the provided descriptors matches the binding ordering
+## within the shader.
 func create_descriptor_set(descriptors : Array[Descriptor], shader : RID, descriptor_set_index :=0) -> RID:
 	var uniforms : Array[RDUniform]
 	for i in range(len(descriptors)):
@@ -74,9 +74,9 @@ func create_descriptor_set(descriptors : Array[Descriptor], shader : RID, descri
 		uniforms.push_back(uniform)
 	return deletion_queue.push(device.uniform_set_create(uniforms, shader, descriptor_set_index))
 
-### Returns a [Callable] which will dispatch a compute pipeline (within a compute) list based on the
-### provided block dimensions. The ordering of the provided descriptor sets matches the set ordering
-### within the shader.
+## Returns a [Callable] which will dispatch a compute pipeline (within a compute) list based on the
+## provided block dimensions. The ordering of the provided descriptor sets matches the set ordering
+## within the shader.
 func create_pipeline(block_dimensions : Array[int], descriptor_sets : Array[RID], shader : RID) -> Callable:
 	assert(len(block_dimensions) == 3, 'Must specify block dimensions for all x, y, z dimensions!')
 	var pipeline = deletion_queue.push(device.compute_pipeline_create(shader))
@@ -94,8 +94,8 @@ func create_pipeline(block_dimensions : Array[int], descriptor_sets : Array[RID]
 			
 		device.compute_list_dispatch(compute_list, block_dimensions[0], block_dimensions[1], block_dimensions[2])
 
-### Returns a [PackedFloat32Array] from the provided data, whose size is rounded up to the nearest
-### power of 2 with a minimum size of 16.
+## Returns a [PackedFloat32Array] from the provided data, whose size is rounded up to the nearest
+## power of 2 with a minimum size of 16.
 func _pack_data_f32(data : Array) -> PackedByteArray:
 	var packed_data := PackedFloat32Array(data).to_byte_array()
 	assert(packed_data.size() <= 1024, 'Push constant size must be less than 1024 bytes!')

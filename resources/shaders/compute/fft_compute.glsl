@@ -1,13 +1,12 @@
 #[compute]
 #version 460
-/** A coalesced Stockham FFT kernel. */
+/** A coalesced decimation-in-time Stockham FFT kernel. */
 
 #define PI         (3.141592653589793)
-#define TAU        (6.283185307179586)
 #define MAP_SIZE   (256U)
 #define NUM_STAGES (8U) // log2(MAP_SIZE)
 
-layout(local_size_x = 256, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = MAP_SIZE, local_size_y = 1, local_size_z = 1) in;
 
 layout(std430, set = 0, binding = 0) restrict buffer FFTBuffer {
 	vec4 butterfly[NUM_STAGES][MAP_SIZE];
