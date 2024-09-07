@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://bi5m21vuwub1b"
+path="res://.godot/imported/spectrum_compute.glsl-a7e3f674c29089ae05c011c32cd2e318.res"
+
+[deps]
+
+source_file="res://assets/shaders/compute/spectrum_compute.glsl"
+dest_files=["res://.godot/imported/spectrum_compute.glsl-a7e3f674c29089ae05c011c32cd2e318.res"]
+
+[params]
+

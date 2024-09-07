@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://c5nf8ddsmdjsj"
+path="res://.godot/imported/fft_compute.glsl-a42711879dfa7e3249a6054b285ce471.res"
+
+[deps]
+
+source_file="res://assets/shaders/compute/fft_compute.glsl"
+dest_files=["res://.godot/imported/fft_compute.glsl-a42711879dfa7e3249a6054b285ce471.res"]
+
+[params]
+

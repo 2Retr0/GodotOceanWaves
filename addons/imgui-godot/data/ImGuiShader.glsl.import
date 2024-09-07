@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://belucuvjtb04o"
+path="res://.godot/imported/ImGuiShader.glsl-2f8c9595e5031ef8022ed7e6f565729e.res"
+
+[deps]
+
+source_file="res://addons/imgui-godot/data/ImGuiShader.glsl"
+dest_files=["res://.godot/imported/ImGuiShader.glsl-2f8c9595e5031ef8022ed7e6f565729e.res"]
+
+[params]
+

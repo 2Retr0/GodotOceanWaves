@@ -12,19 +12,24 @@ config_version=5
 
 config/name="OceanWaves"
 run/main_scene="res://main.tscn"
-config/features=PackedStringArray("4.2", "Forward Plus")
+config/features=PackedStringArray("4.3", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [autoload]
 
-DebugMenu="*res://addons/debug_menu/debug_menu.tscn"
+ImGuiRoot="*res://addons/imgui-godot/data/ImGuiRoot.tscn"
+
+[debug]
+
+gdscript/warnings/shadowed_variable=0
+gdscript/warnings/incompatible_ternary=0
+gdscript/warnings/integer_division=0
 
 [display]
 
-window/size/viewport_width=1440
-window/size/viewport_height=810
 window/stretch/mode="canvas_items"
+window/stretch/aspect="ignore"
 window/vsync/vsync_mode=3
 window/quality/msaa_2d=0
 window/quality/msaa_3d=1
@@ -32,7 +37,20 @@ window/show_image=false
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_menu/plugin.cfg")
+enabled=PackedStringArray("res://addons/imgui-godot/plugin.cfg")
+
+[input]
+
+toggle_imgui={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"command_or_control_autoremap":true,"alt_pressed":false,"shift_pressed":false,"pressed":false,"keycode":0,"physical_keycode":72,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
+toggle_fullscreen={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"command_or_control_autoremap":true,"alt_pressed":false,"shift_pressed":false,"pressed":false,"keycode":0,"physical_keycode":70,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 
 [rendering]
 

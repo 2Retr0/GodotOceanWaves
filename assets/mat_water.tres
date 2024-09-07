@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://byumtcccq4ew3"]
+
+[ext_resource type="Shader" path="res://assets/shaders/spatial/fft_water.gdshader" id="1_pwxhr"]
+
+[sub_resource type="Texture2DArrayRD" id="Texture2DArrayRD_ts40p"]
+
+[sub_resource type="Texture2DArrayRD" id="Texture2DArrayRD_7ije1"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_pwxhr")
+shader_parameter/water_color = Color(0.17, 0.27, 0.3, 1)
+shader_parameter/foam_color = Color(0.73, 0.67, 0.62, 1)
+shader_parameter/roughness = 0.5
+shader_parameter/normal_strength = 0.4
+shader_parameter/num_cascades = 3
+shader_parameter/map_scales = PackedVector2Array(0.0104167, 0.0104167, 0.0175439, 0.0175439, 0.0666667, 0.0666667)
+shader_parameter/displacements = SubResource("Texture2DArrayRD_ts40p")
+shader_parameter/normals = SubResource("Texture2DArrayRD_7ije1")
