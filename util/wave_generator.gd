@@ -11,7 +11,6 @@ var pipelines : Dictionary
 var descriptors : Dictionary
 
 func init_gpu() -> void:
-	print('init_gpu!')
 	# --- DEVICE/SHADER CREATION ---
 	if not context: context = RenderingContext.create(RenderingServer.get_rendering_device())
 	var spectrum_compute_shader := context.load_shader('./assets/shaders/compute/spectrum_compute.glsl')
@@ -59,6 +58,7 @@ func generate_maps(delta : float) -> void:
 	for i in len(parameters):
 		var params := parameters[i]
 		params.time += delta * params.time_scale # Update each cascade's time based on its time scale parameter
+		#print(i, ' ', params.spectrum_seed)
 
 		if params.should_generate_spectrum:
 			var alpha := JONSWAP_alpha(params.wind_speed, params.fetch_length*1e3)

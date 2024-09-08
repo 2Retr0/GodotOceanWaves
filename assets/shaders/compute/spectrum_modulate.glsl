@@ -62,7 +62,7 @@ void main() {
 
 	// --- WAVE SPECTRUM MODULATION ---
 	vec4 h0 = imageLoad(spectrum, id); // xy=h0(k), zw=conj(h0(-k))
-	float dispersion = dispertion_relation(k) * (time + float(cascade_index));
+	float dispersion = dispertion_relation(k) * time;
 	vec2 modulation = exp_complex(dispersion);
 	// Note: h respects the complex conjugation property
 	vec2 h = mul_complex(h0.xy, modulation) + mul_complex(h0.zw, conj_complex(modulation));

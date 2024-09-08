@@ -39,7 +39,6 @@ static func create(device : RenderingDevice=null) -> RenderingContext:
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
-		print('cleanup!')
 		# All resources must be freed after use to avoid memory leaks.
 		deletion_queue.flush(device)
 		shader_cache.clear()

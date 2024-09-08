@@ -1,37 +1,39 @@
-[gd_scene load_steps=12 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=15 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_skarq"]
 [ext_resource type="Script" path="res://util/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
 [ext_resource type="Script" path="res://util/camera.gd" id="4_v2yip"]
-[ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/clipmap.obj" id="5_43nyd"]
+[ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/clipmap_high.obj" id="5_7ycjq"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/mat_water.tres" id="5_lt75t"]
+[ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
+[ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
 
-[sub_resource type="Resource" id="Resource_lsbpp"]
+[sub_resource type="Resource" id="Resource_hdqvf"]
 script = ExtResource("2_pw5n6")
-tile_length = Vector2(96, 96)
+tile_length = Vector2(88, 88)
 time_scale = 1.0
-wind_speed = 5.0
-wind_direction = 5.0
+wind_speed = 10.0
+wind_direction = 20.0
 fetch_length = 150.0
-swell = 0.0
+swell = 0.8
 detail = 1.0
 spread = 0.2
 whitecap = 0.5
-foam_amount = 5.0
+foam_amount = 8.0
 
-[sub_resource type="Resource" id="Resource_gi7pr"]
+[sub_resource type="Resource" id="Resource_eax8d"]
 script = ExtResource("2_pw5n6")
 tile_length = Vector2(57, 57)
 time_scale = 1.0
 wind_speed = 5.0
-wind_direction = 10.0
+wind_direction = 15.0
 fetch_length = 150.0
 swell = 0.8
-detail = 1.0
-spread = 0.5
+detail = 0.8
+spread = 0.4
 whitecap = 0.5
-foam_amount = 1.5
+foam_amount = 0.0
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
 panorama = ExtResource("3_0ksgj")
@@ -43,22 +45,32 @@ sky_material = SubResource("PanoramaSkyMaterial_t7jwl")
 background_mode = 2
 sky = SubResource("Sky_vroi3")
 tonemap_mode = 2
-fog_enabled = true
-fog_light_color = Color(0.851516, 0.865572, 0.809149, 1)
-fog_density = 0.0005
-fog_sky_affect = 0.1
-volumetric_fog_density = 0.0098
-volumetric_fog_albedo = Color(0.568627, 0.662745, 0.698039, 1)
-volumetric_fog_ambient_inject = 0.05
-volumetric_fog_sky_affect = 0.0
+fog_mode = 1
+fog_light_color = Color(0.272954, 0.419272, 0.484632, 1)
+fog_sun_scatter = 0.05
+fog_density = 1.0
+fog_aerial_perspective = 0.626
+fog_sky_affect = 0.0
+fog_depth_curve = 0.25
+fog_depth_begin = 200.0
+fog_depth_end = 350.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0
+volumetric_fog_length = 256.0
 adjustment_enabled = true
-adjustment_contrast = 0.9
+adjustment_brightness = 0.85
+adjustment_contrast = 1.07
 adjustment_saturation = 1.5
 
+[sub_resource type="FogMaterial" id="FogMaterial_riff4"]
+density = 8.0
+albedo = Color(0.988718, 0.989631, 0.989629, 1)
+height_falloff = 0.351198
+edge_fade = 1.75
+
 [node name="Main" type="Node3D"]
-transform = Transform3D(0.999717, -0.009317, -0.0218871, 0.00924503, 0.999952, -0.0033871, 0.0219176, 0.0031838, 0.999755, 0, 0, 0)
 script = ExtResource("1_skarq")
-wave_cascade_parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_lsbpp"), SubResource("Resource_gi7pr")])
+wave_cascades = Array[ExtResource("2_pw5n6")]([SubResource("Resource_hdqvf"), SubResource("Resource_eax8d")])
 
 [node name="Environment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_icybu")
@@ -71,13 +83,27 @@ shadow_opacity = 0.8
 shadow_blur = 5.0
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(-0.984808, 0.0181512, -0.172697, 0, 0.994522, 0.104528, 0.173648, 0.10294, -0.979413, -1.48306, 7.49735, -4.24417)
+transform = Transform3D(-0.996195, -0.0151344, 0.0858316, 0, 0.984807, 0.173648, -0.0871557, 0.172987, -0.981061, 0, 10, -25)
 script = ExtResource("4_v2yip")
 
-[node name="Water" type="Node3D" parent="."]
-transform = Transform3D(1, 2.18279e-11, 1.67638e-08, -1.25729e-08, 1, 8.17236e-08, -6.94767e-07, 0, 1, 0, 0, 0)
-
-[node name="WaterTest" type="MeshInstance3D" parent="Water"]
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 2.18279e-11, 1.67638e-08, -1.25729e-08, 1, 8.17236e-08, -6.94767e-07, 0, 1, -4, 0, -24)
+sorting_offset = 999.0
+material_override = ExtResource("5_lt75t")
 cast_shadow = 0
-mesh = ExtResource("5_43nyd")
-surface_material_override/0 = ExtResource("5_lt75t")
+mesh = ExtResource("5_7ycjq")
+skeleton = NodePath("")
+
+[node name="FogVolume" type="FogVolume" parent="."]
+shape = 4
+material = SubResource("FogMaterial_riff4")
+
+[node name="OceanAudioPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_jpklm")
+volume_db = 15.0
+autoplay = true
+
+[node name="WindAudioPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_6r5si")
+volume_db = -30.0
+autoplay = true

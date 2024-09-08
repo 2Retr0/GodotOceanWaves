@@ -18,20 +18,22 @@ class_name WaveCascadeParameters extends Resource
 @export_range(0, 2) var swell := 0.8 :
 	set(value): swell = value; should_generate_spectrum = true; _swell = [value]
 ## Modifies the attenuation of high frequency waves.
+# This should be reduced as the number of cascades increases to avoid *too* much detail!
 @export_range(0, 1) var detail := 1.0 :
 	set(value): detail = value; should_generate_spectrum = true; _detail = [value]
 ## Modifies how much wind and swell affect the direction of the waves.
 @export_range(0, 1) var spread := 0.2 :
 	set(value): spread = value; should_generate_spectrum = true; _spread = [value]
 ## Modifies how steep a wave needs to be before foam can accumulate.
+# 'Wispier' foam can be created by increasing the 'foam_amount' and decreasing the 'whitecap' parameters.
 @export_range(0, 2) var whitecap := 0.5 :
 	set(value): whitecap = value; should_generate_spectrum = true; _whitecap = [value]
 @export_range(0, 10) var foam_amount := 5.0 :
 	set(value): foam_amount = value; should_generate_spectrum = true; _foam_amount = [value]
 
-var spectrum_seed := Vector2i(randi_range(-10000, 10000), randi_range(-10000, 10000))
+var spectrum_seed := Vector2i.ZERO
 var should_generate_spectrum = true
-var time := 0.0
+var time : float
 
 # References to wave cascade parameters (for imgui). The actual parameters won't
 # reflect these values unless manually synced!

@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://mkodygt504hm"
+path="res://.godot/imported/clipmap_low.obj-a355068c5ea45f1369eaed924eaac791.mesh"
+
+[deps]
+
+files=["res://.godot/imported/clipmap_low.obj-a355068c5ea45f1369eaed924eaac791.mesh"]
+
+source_file="res://assets/clipmap_low.obj"
+dest_files=["res://.godot/imported/clipmap_low.obj-a355068c5ea45f1369eaed924eaac791.mesh", "res://.godot/imported/clipmap_low.obj-a355068c5ea45f1369eaed924eaac791.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

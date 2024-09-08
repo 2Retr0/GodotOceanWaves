@@ -22,6 +22,7 @@ ImGuiRoot="*res://addons/imgui-godot/data/ImGuiRoot.tscn"
 
 [debug]
 
+gdscript/warnings/unused_parameter=0
 gdscript/warnings/shadowed_variable=0
 gdscript/warnings/incompatible_ternary=0
 gdscript/warnings/integer_division=0
