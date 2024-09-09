@@ -45,7 +45,7 @@ vec2 conj_complex(in vec2 x) {
 }
 
 // Jerry Tessendorf - Source: Simulating Ocean Water
-float dispertion_relation(in float k) {
+float dispersion_relation(in float k) {
 	return sqrt(G*k*tanh(k*depth + 1e-6));
 }
 
@@ -57,12 +57,12 @@ void main() {
 	const ivec3 id = ivec3(gl_GlobalInvocationID.xy, cascade_index);
 
 	vec2 k_vec = (id.xy - dims*0.5)*2.0*PI / tile_length; // Wave direction
-	float k = length(k_vec) + 1e-6;
+	float k = length(k_vec) + 1e-10;
 	vec2 k_unit = k_vec / k;
 
 	// --- WAVE SPECTRUM MODULATION ---
 	vec4 h0 = imageLoad(spectrum, id); // xy=h0(k), zw=conj(h0(-k))
-	float dispersion = dispertion_relation(k) * time;
+	float dispersion = dispersion_relation(k) * time;
 	vec2 modulation = exp_complex(dispersion);
 	// Note: h respects the complex conjugation property
 	vec2 h = mul_complex(h0.xy, modulation) + mul_complex(h0.zw, conj_complex(modulation));
