@@ -1,10 +1,10 @@
 #[compute]
 #version 460
-/** 
+/**
  * Modulates the JONSWAP wave spectra texture in time and calculates
  * its gradients. Since the outputs are all real-valued, they are packed
  * in pairs.
- * 
+ *
  * Sources: Jerry Tessendorf - Simulating Ocean Water
  *          Robert Matusiak - Implementing Fast Fourier Transform Algorithms of Real-Valued Sequences With the TMS320 DSP Platform
  */
@@ -46,7 +46,7 @@ vec2 conj_complex(in vec2 x) {
 
 // Jerry Tessendorf - Source: Simulating Ocean Water
 float dispersion_relation(in float k) {
-	return sqrt(G*k*tanh(k*depth + 1e-6));
+	return sqrt(G*k*tanh(k*depth));
 }
 
 #define FFT_DATA(id, layer) (data[(id.z)*map_size*map_size*NUM_SPECTRA*2 + (layer)*map_size*map_size + (id.y)*map_size + (id.x)])
@@ -57,7 +57,7 @@ void main() {
 	const ivec3 id = ivec3(gl_GlobalInvocationID.xy, cascade_index);
 
 	vec2 k_vec = (id.xy - dims*0.5)*2.0*PI / tile_length; // Wave direction
-	float k = length(k_vec) + 1e-10;
+	float k = length(k_vec) + 1e-6;
 	vec2 k_unit = k_vec / k;
 
 	// --- WAVE SPECTRUM MODULATION ---
@@ -83,7 +83,7 @@ void main() {
 
 	// Because h repsects the complex conjugation property (i.e., the output of IFFT will be a
 	// real signal), we can pack two waves into one.
-	FFT_DATA(id, 0) = vec2(    hx.x -     hy.y,     hx.y +     hy.x);	
+	FFT_DATA(id, 0) = vec2(    hx.x -     hy.y,     hx.y +     hy.x);
 	FFT_DATA(id, 1) = vec2(    hz.x - dhy_dx.y,     hz.y + dhy_dx.x);
 	FFT_DATA(id, 2) = vec2(dhy_dz.x - dhx_dx.y, dhy_dz.y + dhx_dx.x);
 	FFT_DATA(id, 3) = vec2(dhz_dz.x - dhz_dx.y, dhz_dz.y + dhz_dx.x);

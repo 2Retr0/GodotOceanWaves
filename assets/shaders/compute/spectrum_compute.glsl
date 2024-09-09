@@ -1,6 +1,6 @@
 #[compute]
 #version 460
-/** 
+/**
  * Generates a 2D texture representing the JONSWAP wave spectra
  * w/ Hasselmann directional spreading.
  *
@@ -57,7 +57,7 @@ vec2 conj_complex(in vec2 x) {
 // Source: Jerry Tessendorf - Simulating Ocean Water
 vec2 dispersion_relation(in float k) {
 	float a = k*depth;
-	float b = tanh(a + 1e-6);
+	float b = tanh(a);
 	float dispersion_relation = sqrt(G*k*b);
 	float d_dispersion_relation = 0.5*G * (b + a*(1.0 - b*b)) / dispersion_relation;
 
@@ -103,7 +103,7 @@ float TMA_spectrum(in float w, in float w_p, in float alpha) {
 vec2 get_spectrum_amplitude(in ivec2 id, in ivec2 map_size) {
 	vec2 dk = 2.0*PI / tile_length;
 	vec2 k_vec = (id - map_size*0.5)*dk; // Wave direction
-	float k = length(k_vec) + 1e-10;
+	float k = length(k_vec) + 1e-6;
 	float theta = atan(k_vec.x, k_vec.y);
 
 	vec2 dispersion = dispersion_relation(k);
