@@ -36,12 +36,50 @@ void vertex() {
 	wave_height = displacement.y;
 }
 
+/** Filter weights for a cubic B-spline. */
+vec4 cubic_weights(float a) {
+	float a2 = a*a;
+	float a3 = a2*a;
+	
+	float w0 =-a3     + a2*3.0 - a*3.0 + 1.0;
+	float w1 = a3*3.0 - a2*6.0         + 4.0;
+	float w2 =-a3*3.0 + a2*3.0 + a*3.0 + 1.0;
+	float w3 = a3;
+	return vec4(w0, w1, w2, w3) / 6.0;
+}
+
+/** Performs bicubic B-spline filtering on the provided sampler. */
+// Source: https://developer.nvidia.com/gpugems/gpugems2/part-iii-high-quality-rendering/chapter-20-fast-third-order-texture-filtering
+vec4 texture_bicubic(in sampler2DArray sampler, in vec3 uvw) {
+	vec2 dims = vec2(textureSize(sampler, 0).xy);
+	vec2 dims_inv = 1.0 / dims;
+	uvw.xy = uvw.xy*dims + 0.5;
+	
+	vec2 fuv = fract(uvw.xy);
+	vec4 wx = cubic_weights(fuv.x);
+	vec4 wy = cubic_weights(fuv.y);
+
+	vec4 g = vec4(wx.xz + wx.yw, wy.xz + wy.yw);
+	vec4 h = (vec4(wx.yw, wy.yw) / g + vec2(-1.5, 0.5).xyxy + floor(uvw.xy).xxyy)*dims_inv.xxyy;
+	vec2 w = g.xz / (g.xz + g.yw);
+    return mix(
+		mix(texture(sampler, vec3(h.yw, uvw.z)), texture(sampler, vec3(h.xw, uvw.z)), w.x),
+		mix(texture(sampler, vec3(h.yz, uvw.z)), texture(sampler, vec3(h.xz, uvw.z)), w.x), w.y); 
+}
+
 void fragment() {
+	float map_size = float(textureSize(normals, 0).x);
 	float dist = length(VERTEX.xz);
 	// Read foam and normal information from normal maps.
 	vec3 gradient = vec3(0);
-	for (int i = 0; i < num_cascades; ++i)
-		gradient += texture(normals, vec3(UV*map_scales[i], float(i))).xyw;
+	for (int i = 0; i < num_cascades; ++i) {
+		vec2 tile = map_scales[i];
+		vec3 coords = vec3(UV*tile, float(i));
+		float ppm = map_size * min(tile.x, tile.y); // Pixels per meter
+		// Mix between bicubic and bilinear filtering depending on the world space pixels per meter.
+		gradient += mix(texture_bicubic(normals, coords), texture(normals, coords), min(1.0, ppm*0.1)).xyw;
+	}
+		
 	foam_factor = smoothstep(0.0, 1.0, gradient.z*0.75) * exp(-dist*0.0075);
 	ALBEDO = mix(water_color, foam_color, foam_factor);
 
