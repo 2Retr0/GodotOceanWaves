@@ -15,7 +15,7 @@ var should_render_imgui := not Engine.is_editor_hint()
 @onready var _water_color := [water.water_color.r, water.water_color.g, water.water_color.b]
 @onready var _foam_color := [water.foam_color.r, water.foam_color.g, water.foam_color.b]
 
-func _init() -> void: 
+func _init() -> void:
 	if Engine.is_editor_hint(): return
 	if DisplayServer.window_get_vsync_mode() == DisplayServer.VSYNC_ENABLED:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)

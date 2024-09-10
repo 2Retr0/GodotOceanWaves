@@ -1,5 +1,5 @@
 @tool
-class_name WaveGenerator extends Object
+class_name WaveGenerator extends Node
 ## Handles the compute pipeline for wave spectra generation/FFT.
 
 const G := 9.81
@@ -9,6 +9,10 @@ var map_size : int
 var context : RenderingContext
 var pipelines : Dictionary
 var descriptors : Dictionary
+
+# Generator state per invocation of `update()`.
+var pass_parameters : Array[WaveCascadeParameters]
+var pass_num_cascades_remaining : int
 
 func init_gpu(num_cascades : int) -> void:
 	# --- DEVICE/SHADER CREATION ---
@@ -49,34 +53,61 @@ func init_gpu(num_cascades : int) -> void:
 	pipelines['fft_butterfly'].call(context, compute_list)
 	context.compute_list_end()
 
-func generate_maps(delta : float, parameters : Array[WaveCascadeParameters]) -> void:
-	if parameters.size() == 0: return
-	if not context: init_gpu(maxi(2, len(parameters))) # FIXME: This is needed because my RenderContext API sucks...
+func _process(delta: float) -> void:
+	# Update one cascade each frame for load balancing.
+	if pass_num_cascades_remaining == 0: return
+	pass_num_cascades_remaining -= 1
 
 	var compute_list := context.compute_list_begin()
-	for i in len(parameters):
-		var params := parameters[i]
-		params.time += delta * params.time_scale # Update each cascade's time based on its time scale parameter
-
-		if params.should_generate_spectrum:
-			var alpha := JONSWAP_alpha(params.wind_speed, params.fetch_length*1e3)
-			var omega := JONSWAP_peak_angular_frequency(params.wind_speed, params.fetch_length*1e3)
-			pipelines['spectrum_compute'].call(context, compute_list, RenderingContext.create_push_constant([params.spectrum_seed.x, params.spectrum_seed.y, params.tile_length.x, params.tile_length.y, alpha, omega, params.wind_speed, deg_to_rad(params.wind_direction), DEPTH, params.swell, params.detail, params.spread, i]))
-			params.should_generate_spectrum = false
-
-	for i in len(parameters): pipelines['spectrum_modulate'].call(context, compute_list, RenderingContext.create_push_constant([parameters[i].tile_length.x, parameters[i].tile_length.y, DEPTH, parameters[i].time, i]))
-	for i in len(parameters): pipelines['fft_compute'].call(context, compute_list, RenderingContext.create_push_constant([i]))
-	for i in len(parameters): pipelines['transpose'].call(context, compute_list, RenderingContext.create_push_constant([i]))
-	context.compute_list_add_barrier(compute_list) # FIXME: Why is a barrier only needed here?!
-	for i in len(parameters): pipelines['fft_compute'].call(context, compute_list, RenderingContext.create_push_constant([i]))
-	# Note: We need not do a second transpose here since rotating the wave by pi/2 doesn't affect it visually.
-	for i in len(parameters):
-		var params := parameters[i]
-		# Note: Constants are used to normalize parameters between 0 and 10.
-		var foam_grow_rate := delta*params.time_scale * params.foam_amount*7.5
-		var foam_decay_rate := delta*params.time_scale * maxf(0.5, 10.0 - params.foam_amount)*1.15
-		pipelines['fft_unpack'].call(context, compute_list, RenderingContext.create_push_constant([i, params.whitecap, foam_grow_rate, foam_decay_rate]))
+	_update(compute_list, pass_num_cascades_remaining, pass_parameters)
 	context.compute_list_end()
+
+func _update(compute_list : int, cascade_index : int, parameters : Array[WaveCascadeParameters]) -> void:
+	var params := parameters[cascade_index]
+	## --- WAVE SPECTRA UPDATE ---
+	if params.should_generate_spectrum:
+		var alpha := JONSWAP_alpha(params.wind_speed, params.fetch_length*1e3)
+		var omega := JONSWAP_peak_angular_frequency(params.wind_speed, params.fetch_length*1e3)
+		pipelines['spectrum_compute'].call(context, compute_list, RenderingContext.create_push_constant([params.spectrum_seed.x, params.spectrum_seed.y, params.tile_length.x, params.tile_length.y, alpha, omega, params.wind_speed, deg_to_rad(params.wind_direction), DEPTH, params.swell, params.detail, params.spread, cascade_index]))
+		params.should_generate_spectrum = false
+	pipelines['spectrum_modulate'].call(context, compute_list, RenderingContext.create_push_constant([params.tile_length.x, params.tile_length.y, DEPTH, params.time, cascade_index]))
+
+	## --- WAVE SPECTRA INVERSE FOURIER TRANSFORM ---
+	var fft_push_constant := RenderingContext.create_push_constant([cascade_index])
+	# Note: We need not do a second transpose after computing FFT on rows since rotating the wave by
+	#       PI/2 doesn't affect it visually.
+	pipelines['fft_compute'].call(context, compute_list, fft_push_constant)
+	pipelines['transpose'].call(context, compute_list, fft_push_constant)
+	context.compute_list_add_barrier(compute_list) # FIXME: Why is a barrier only needed here?!
+	pipelines['fft_compute'].call(context, compute_list, fft_push_constant)
+
+	## --- DISPLACEMENT/NORMAL MAP UPDATE ---
+	pipelines['fft_unpack'].call(context, compute_list, RenderingContext.create_push_constant([cascade_index, params.whitecap, params.foam_grow_rate, params.foam_decay_rate]))
+
+## Begins updating wave cascades based on the provided parameters. To balance stutter,
+## the generator will schedule one cascade update per frame. All cascades from the
+## previous invocation that have not been processed yet will be updated.
+func update(delta : float, parameters : Array[WaveCascadeParameters]) -> void:
+	assert(parameters.size() != 0)
+	if not context:
+		init_gpu(maxi(2, len(parameters))) # FIXME: This is needed because my RenderContext API sucks...
+	elif pass_num_cascades_remaining != 0: # Update cascades from previous invocation that have yet to be processed...
+		var compute_list := context.compute_list_begin()
+		for i in range(pass_num_cascades_remaining):
+			_update(compute_list, i, pass_parameters)
+		context.compute_list_end()
+
+	# Update each cascade's parameters that rely on time delta
+	for i in len(parameters):
+		var params := parameters[i]
+		var cascade_delta := delta * params.time_scale
+		params.time += cascade_delta
+		# Note: The constants are used to normalize parameters between 0 and 10.
+		params.foam_grow_rate = cascade_delta * params.foam_amount*7.5
+		params.foam_decay_rate = cascade_delta * maxf(0.5, 10.0 - params.foam_amount)*1.15
+
+	pass_parameters = parameters
+	pass_num_cascades_remaining = len(parameters)
 
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:

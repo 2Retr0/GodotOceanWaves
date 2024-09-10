@@ -32,7 +32,10 @@ class_name WaveCascadeParameters extends Resource
 
 var spectrum_seed := Vector2i.ZERO
 var should_generate_spectrum = true
+
 var time : float
+var foam_grow_rate : float
+var foam_decay_rate : float
 
 # References to wave cascade parameters (for imgui). The actual parameters won't
 # reflect these values unless manually synced!

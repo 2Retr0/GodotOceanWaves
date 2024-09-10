@@ -49,7 +49,11 @@ enum MeshQuality { LOW, HIGH }
 		next_update_time = next_update_time - (1.0/(updates_per_second + 1e-10) - 1.0/(value + 1e-10))
 		updates_per_second = value
 
-var wave_generator : WaveGenerator
+var wave_generator : WaveGenerator :
+	set(value):
+		if wave_generator: wave_generator.queue_free()
+		wave_generator = value
+		add_child(wave_generator)
 var displacement_maps := Texture2DArrayRD.new()
 var normal_maps := Texture2DArrayRD.new()
 var map_scales : PackedVector2Array
@@ -88,9 +92,8 @@ func _setup_wave_generator() -> void:
 	WATER_MAT.set_shader_parameter('normals', normal_maps)
 
 func _update_water(delta : float) -> void:
-	if wave_generator == null:
-		_setup_wave_generator()
-	wave_generator.generate_maps(delta, parameters)
+	if wave_generator == null: _setup_wave_generator()
+	wave_generator.update(delta, parameters)
 
 	for i in len(parameters):
 		map_scales[i] = Vector2.ONE / parameters[i].tile_length
