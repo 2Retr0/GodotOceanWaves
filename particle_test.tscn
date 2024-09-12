@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://dvtytqvge1n1x"]
+
+[ext_resource type="Shader" path="res://assets/shaders/spatial/sea_spray_particle.gdshader" id="1_ipmau"]
+[ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="1_kirye"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjlwq"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.578)
+albedo_texture = ExtResource("1_kirye")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_smi06"]
+shader = ExtResource("1_ipmau")
+shader_parameter/direction = Vector3(1, 0, 0)
+shader_parameter/spread = 45.0
+shader_parameter/flatness = 0.0
+shader_parameter/emission_shape_offset = Vector3(0, 0, 0)
+shader_parameter/emission_shape_scale = Vector3(1, 1, 1)
+shader_parameter/gravity = Vector3(0, -9.81, 0)
+
+[sub_resource type="QuadMesh" id="QuadMesh_5xc4g"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+material_override = SubResource("StandardMaterial3D_pjlwq")
+amount = 1
+process_material = SubResource("ShaderMaterial_smi06")
+draw_pass_1 = SubResource("QuadMesh_5xc4g")

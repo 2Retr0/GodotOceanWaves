@@ -4,6 +4,7 @@ extends MeshInstance3D
 ## managing wave generation pipelines.
 
 const WATER_MAT := preload('res://assets/water/mat_water.tres')
+const SPRAY_MAT := preload('res://assets/water/mat_spray.tres')
 const WATER_MESH_HIGH := preload('res://assets/water/clipmap_high.obj')
 const WATER_MESH_LOW := preload('res://assets/water/clipmap_low.obj')
 
@@ -11,10 +12,10 @@ enum MeshQuality { LOW, HIGH }
 
 @export_group('Wave Parameters')
 @export_color_no_alpha var water_color : Color = Color(0.1, 0.15, 0.18) :
-	set(value): water_color = value; WATER_MAT.set_shader_parameter('water_color', water_color)
+	set(value): water_color = value; RenderingServer.global_shader_parameter_set(&'water_color', water_color.srgb_to_linear())
 
 @export_color_no_alpha var foam_color : Color = Color(0.73, 0.67, 0.62) :
-	set(value): foam_color = value; WATER_MAT.set_shader_parameter('foam_color', foam_color)
+	set(value): foam_color = value; RenderingServer.global_shader_parameter_set(&'foam_color', foam_color.srgb_to_linear())
 
 ## The parameters for wave cascades. Each parameter set represents one cascade.
 @export var parameters : Array[WaveCascadeParameters] :
@@ -54,15 +55,20 @@ var wave_generator : WaveGenerator :
 		if wave_generator: wave_generator.queue_free()
 		wave_generator = value
 		add_child(wave_generator)
-var displacement_maps := Texture2DArrayRD.new()
-var normal_maps := Texture2DArrayRD.new()
-var map_scales : PackedVector2Array
 var rng = RandomNumberGenerator.new()
 var time := 0.0
 var next_update_time := 0.0
 
+var displacement_maps := Texture2DArrayRD.new()
+var normal_maps := Texture2DArrayRD.new()
+var map_scales : PackedVector2Array
+
 func _init() -> void:
 	rng.set_seed(1234)
+
+func _ready() -> void:
+	RenderingServer.global_shader_parameter_set(&'water_color', water_color.srgb_to_linear())
+	RenderingServer.global_shader_parameter_set(&'foam_color', foam_color.srgb_to_linear())
 
 func _process(delta : float) -> void:
 	# Update waves once every 1.0/updates_per_second.
@@ -84,20 +90,23 @@ func _setup_wave_generator() -> void:
 
 	displacement_maps.texture_rd_rid = RID()
 	normal_maps.texture_rd_rid = RID()
-	displacement_maps.texture_rd_rid = wave_generator.descriptors['displacement_map'].rid
-	normal_maps.texture_rd_rid = wave_generator.descriptors['normal_map'].rid
+	displacement_maps.texture_rd_rid = wave_generator.descriptors[&'displacement_map'].rid
+	normal_maps.texture_rd_rid = wave_generator.descriptors[&'normal_map'].rid
 
-	WATER_MAT.set_shader_parameter('num_cascades', parameters.size())
-	WATER_MAT.set_shader_parameter('displacements', displacement_maps)
-	WATER_MAT.set_shader_parameter('normals', normal_maps)
+	RenderingServer.global_shader_parameter_set(&'num_cascades', parameters.size())
+	RenderingServer.global_shader_parameter_set(&'displacements', displacement_maps)
+	RenderingServer.global_shader_parameter_set(&'normals', normal_maps)
 
 func _update_water(delta : float) -> void:
 	if wave_generator == null: _setup_wave_generator()
 	wave_generator.update(delta, parameters)
 
+	# This doesn't need to run every iteration... but whatever :3
 	for i in len(parameters):
 		map_scales[i] = Vector2.ONE / parameters[i].tile_length
-	WATER_MAT.set_shader_parameter('map_scales', map_scales)
+	# No global shader parameter for arrays :(
+	WATER_MAT.set_shader_parameter(&'map_scales', map_scales)
+	SPRAY_MAT.set_shader_parameter(&'map_scales', map_scales)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:

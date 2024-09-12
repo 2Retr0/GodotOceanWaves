@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=23 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_skarq"]
 [ext_resource type="Script" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
@@ -9,6 +9,9 @@
 [ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
 [ext_resource type="Script" path="res://assets/water/water.gd" id="7_s0x5e"]
 [ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
+[ext_resource type="Shader" path="res://assets/shaders/spatial/sea_spray.gdshader" id="8_eu8jb"]
+[ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="9_skbf4"]
+[ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
 panorama = ExtResource("3_0ksgj")
@@ -63,6 +66,21 @@ spread = 0.4
 whitecap = 0.5
 foam_amount = 0.0
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_k6xhe"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tsx6q"]
+seamless = true
+noise = SubResource("FastNoiseLite_k6xhe")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ds3o1"]
+render_priority = 0
+shader = ExtResource("8_eu8jb")
+shader_parameter/max_alpha = 0.666
+shader_parameter/albedo_texture = ExtResource("10_spqpo")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_tsx6q")
+
+[sub_resource type="QuadMesh" id="QuadMesh_06d3e"]
+
 [sub_resource type="FogMaterial" id="FogMaterial_riff4"]
 density = 8.0
 albedo = Color(0.988718, 0.989631, 0.989629, 1)
@@ -87,7 +105,7 @@ transform = Transform3D(-0.996195, -0.0151344, 0.0858316, 0, 0.984807, 0.173648,
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 2.18279e-11, 1.67638e-08, -1.25729e-08, 1, 8.17236e-08, -6.94767e-07, 0, 1, -4, 0, -20)
+transform = Transform3D(1, 2.18279e-11, 1.67638e-08, -1.25729e-08, 1, 8.17236e-08, -6.94767e-07, 0, 1, -3, 0, -28)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
@@ -95,6 +113,15 @@ mesh = ExtResource("5_7ycjq")
 skeleton = NodePath("")
 script = ExtResource("7_s0x5e")
 parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0")])
+
+[node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
+transform = Transform3D(15, -1.88592e-07, -1.04215e-05, 1.88592e-07, 15, 8.52651e-14, 1.04215e-05, -2.16293e-13, 15, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_ds3o1")
+cast_shadow = 0
+amount = 27000
+lifetime = 6.0
+process_material = ExtResource("9_skbf4")
+draw_pass_1 = SubResource("QuadMesh_06d3e")
 
 [node name="FogVolume" type="FogVolume" parent="."]
 shape = 4

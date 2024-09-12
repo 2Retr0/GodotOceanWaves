@@ -56,3 +56,26 @@ toggle_fullscreen={
 [rendering]
 
 anti_aliasing/quality/msaa_3d=1
+
+[shader_globals]
+
+displacements={
+"type": "sampler2DArray",
+"value": ""
+}
+normals={
+"type": "sampler2DArray",
+"value": ""
+}
+water_color={
+"type": "color",
+"value": Color(0.0100228, 0.0196066, 0.0272118, 1)
+}
+foam_color={
+"type": "color",
+"value": Color(0, 0, 0, 1)
+}
+num_cascades={
+"type": "uint",
+"value": 0
+}

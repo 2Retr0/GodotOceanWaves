@@ -8,17 +8,17 @@ render_mode world_vertex_coords, shadows_disabled;
 #define MAX_CASCADES 8
 #define REFLECTANCE 0.02 // Reflectance from air to water (eta=1.33).
 
-uniform vec3 water_color : source_color = vec3(0.1, 0.15, 0.18);
-uniform vec3 foam_color : source_color = vec3(0.73, 0.67, 0.62);
+global uniform vec4 water_color : source_color;
+global uniform vec4 foam_color : source_color;
 
 uniform float roughness : hint_range(0.0, 1.0) = 0.4;
 uniform float normal_strength : hint_range(0.0, 1.0) = 1.0;
 
 group_uniforms cascade_data;
-uniform int num_cascades;
+global uniform uint num_cascades;
 uniform vec2 map_scales[MAX_CASCADES];        // Scales for displacement and normal maps.
-uniform sampler2DArray displacements;         // Each layer represents one wave cascade.
-uniform sampler2DArray normals : hint_normal; // Each layer represents one wave cascade.
+global uniform sampler2DArray displacements;         // Each layer represents one wave cascade.
+global uniform sampler2DArray normals : hint_normal; // Each layer represents one wave cascade.
 
 varying float wave_height;
 varying float foam_factor;
@@ -30,7 +30,7 @@ void vertex() {
 
 	// Read displacements from displacement maps.
 	vec3 displacement = vec3(0);
-	for (int i = 0; i < num_cascades; ++i)
+	for (uint i = 0U; i < num_cascades; ++i)
 		displacement += texture(displacements, vec3(UV*map_scales[i], float(i))).xyz;
 	VERTEX += displacement * distance_factor;
 	wave_height = displacement.y;
@@ -72,16 +72,17 @@ void fragment() {
 	float dist = length(VERTEX.xz);
 	// Read foam and normal information from normal maps.
 	vec3 gradient = vec3(0);
-	for (int i = 0; i < num_cascades; ++i) {
+	for (uint i = 0U; i < num_cascades; ++i) {
 		vec2 tile = map_scales[i];
 		vec3 coords = vec3(UV*tile, float(i));
 		float ppm = map_size * min(tile.x, tile.y); // Pixels per meter
 		// Mix between bicubic and bilinear filtering depending on the world space pixels per meter.
+		// This is dependent on the tile size as well as displacement/normal map resolution.
 		gradient += mix(texture_bicubic(normals, coords), texture(normals, coords), min(1.0, ppm*0.1)).xyw;
 	}
 		
 	foam_factor = smoothstep(0.0, 1.0, gradient.z*0.75) * exp(-dist*0.0075);
-	ALBEDO = mix(water_color, foam_color, foam_factor);
+	ALBEDO = mix(water_color.rgb, foam_color.rgb, foam_factor);
 
 	gradient *= mix(0.05, normal_strength, exp(-dist*0.015)); // Blend normal with terrain normal as distance increases.
 	NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
@@ -120,5 +121,5 @@ void light() {
 	float sss_height = 1.0*max(0.0, wave_height + 2.5) * pow(max(dot(LIGHT, -VIEW), 0.0), 4.0) * pow(0.5 - 0.5 * dot(LIGHT, NORMAL), 3.0);
 	float sss_near = 0.5*pow(dot_nv, 2.0);
 	float lambertian = 0.5*dot_nl;
-	DIFFUSE_LIGHT += mix((sss_height + sss_near) * sss_modifier / (1.0 + light_mask) + lambertian, foam_color, foam_factor) * (1.0 - fresnel) * ATTENUATION * LIGHT_COLOR;
+	DIFFUSE_LIGHT += mix((sss_height + sss_near) * sss_modifier / (1.0 + light_mask) + lambertian, foam_color.rgb, foam_factor) * (1.0 - fresnel) * ATTENUATION * LIGHT_COLOR;
 }
