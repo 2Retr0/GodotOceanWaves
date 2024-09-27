@@ -5,18 +5,18 @@ render_mode world_vertex_coords, shadows_disabled;
  * Source: https://gpuopen.com/gdc-presentations/2019/gdc-2019-agtd6-interactive-water-simulation-in-atlas.pdf
  */
 
-#define MAX_CASCADES 8
-#define REFLECTANCE 0.02 // Reflectance from air to water (eta=1.33).
+#define MAX_CASCADES 8    // I am unsure how to generalize this.
+#define REFLECTANCE  0.02 // Reflectance from air to water (eta=1.33).
 
 global uniform vec4 water_color : source_color;
 global uniform vec4 foam_color : source_color;
 
 uniform float roughness : hint_range(0.0, 1.0) = 0.4;
-uniform float normal_strength : hint_range(0.0, 1.0) = 1.0;
+uniform float normal_strength : hint_range(0.0, 1.0) = 1.0; // Global normal strength
 
 group_uniforms cascade_data;
+uniform vec4 map_scales[MAX_CASCADES];               // Scales for displacement/normal maps. Packed: [uv scale, displacement scale, normal scale]
 global uniform uint num_cascades;
-uniform vec2 map_scales[MAX_CASCADES];        // Scales for displacement and normal maps.
 global uniform sampler2DArray displacements;         // Each layer represents one wave cascade.
 global uniform sampler2DArray normals : hint_normal; // Each layer represents one wave cascade.
 
@@ -30,8 +30,10 @@ void vertex() {
 
 	// Read displacements from displacement maps.
 	vec3 displacement = vec3(0);
-	for (uint i = 0U; i < num_cascades; ++i)
-		displacement += texture(displacements, vec3(UV*map_scales[i], float(i))).xyz;
+	for (uint i = 0U; i < num_cascades; ++i) {
+		vec4 scales = map_scales[i];
+		displacement += texture(displacements, vec3(UV*scales.xy, float(i))).xyz * scales.z;
+	}
 	VERTEX += displacement * distance_factor;
 	wave_height = displacement.y;
 }
@@ -73,18 +75,18 @@ void fragment() {
 	// Read foam and normal information from normal maps.
 	vec3 gradient = vec3(0);
 	for (uint i = 0U; i < num_cascades; ++i) {
-		vec2 tile = map_scales[i];
-		vec3 coords = vec3(UV*tile, float(i));
-		float ppm = map_size * min(tile.x, tile.y); // Pixels per meter
+		vec4 scales = map_scales[i];
+		vec3 coords = vec3(UV*scales.xy, float(i));
+		float ppm = map_size * min(scales.x, scales.y); // Pixels per meter
 		// Mix between bicubic and bilinear filtering depending on the world space pixels per meter.
 		// This is dependent on the tile size as well as displacement/normal map resolution.
-		gradient += mix(texture_bicubic(normals, coords), texture(normals, coords), min(1.0, ppm*0.1)).xyw;
+		gradient += mix(texture_bicubic(normals, coords), texture(normals, coords), min(1.0, ppm*0.1)).xyw * vec3(scales.ww, 1.0);
 	}
 		
 	foam_factor = smoothstep(0.0, 1.0, gradient.z*0.75) * exp(-dist*0.0075);
 	ALBEDO = mix(water_color.rgb, foam_color.rgb, foam_factor);
 
-	gradient *= mix(0.05, normal_strength, exp(-dist*0.015)); // Blend normal with terrain normal as distance increases.
+	gradient *= mix(0.015, normal_strength, exp(-dist*0.0175)); // Blend normal with terrain normal as distance increases.
 	NORMAL = (VIEW_MATRIX * vec4(normalize(vec3(-gradient.x, 1.0, -gradient.y)), 0.0)).xyz;
 
 	fresnel = mix(pow(1.0 - dot(VIEW, NORMAL), 5.0*exp(-2.69*roughness)) / (1.0 + 22.7*pow(roughness, 1.5)), 1.0, REFLECTANCE);

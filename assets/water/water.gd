@@ -18,6 +18,7 @@ enum MeshQuality { LOW, HIGH }
 	set(value): foam_color = value; RenderingServer.global_shader_parameter_set(&'foam_color', foam_color.srgb_to_linear())
 
 ## The parameters for wave cascades. Each parameter set represents one cascade.
+## Recreates all compute piplines whenever a cascade is added or removed!
 @export var parameters : Array[WaveCascadeParameters] :
 	set(value):
 		var new_size := len(value)
@@ -25,11 +26,13 @@ enum MeshQuality { LOW, HIGH }
 		for i in range(new_size):
 			# Ensure all values in the array have an associated cascade
 			if not value[i]: value[i] = WaveCascadeParameters.new()
+			if not value[i].is_connected(&'scale_changed', _update_scales_uniform):
+				value[i].scale_changed.connect(_update_scales_uniform)
 			value[i].spectrum_seed = Vector2i(rng.randi_range(-10000, 10000), rng.randi_range(-10000, 10000))
 			value[i].time = 120.0 + PI*i # We make sure to choose a time offset such that cascades don't interfere!
 		parameters = value
-		map_scales.resize(new_size)
 		_setup_wave_generator()
+		_update_scales_uniform()
 
 @export_group('Performance Parameters')
 @export_enum('128x128:128', '256x256:256', '512x512:512', '1024x1024:1024') var map_size := 1024 :
@@ -61,10 +64,9 @@ var next_update_time := 0.0
 
 var displacement_maps := Texture2DArrayRD.new()
 var normal_maps := Texture2DArrayRD.new()
-var map_scales : PackedVector2Array
 
 func _init() -> void:
-	rng.set_seed(1234)
+	rng.set_seed(1234) # This seed gives big waves!
 
 func _ready() -> void:
 	RenderingServer.global_shader_parameter_set(&'water_color', water_color.srgb_to_linear())
@@ -97,16 +99,19 @@ func _setup_wave_generator() -> void:
 	RenderingServer.global_shader_parameter_set(&'displacements', displacement_maps)
 	RenderingServer.global_shader_parameter_set(&'normals', normal_maps)
 
-func _update_water(delta : float) -> void:
-	if wave_generator == null: _setup_wave_generator()
-	wave_generator.update(delta, parameters)
-
-	# This doesn't need to run every iteration... but whatever :3
+func _update_scales_uniform() -> void:
+	var map_scales : PackedVector4Array; map_scales.resize(len(parameters))
 	for i in len(parameters):
-		map_scales[i] = Vector2.ONE / parameters[i].tile_length
+		var params := parameters[i]
+		var uv_scale := Vector2.ONE / params.tile_length
+		map_scales[i] = Vector4(uv_scale.x, uv_scale.y, params.displacement_scale, params.normal_scale)
 	# No global shader parameter for arrays :(
 	WATER_MAT.set_shader_parameter(&'map_scales', map_scales)
 	SPRAY_MAT.set_shader_parameter(&'map_scales', map_scales)
+
+func _update_water(delta : float) -> void:
+	if wave_generator == null: _setup_wave_generator()
+	wave_generator.update(delta, parameters)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:

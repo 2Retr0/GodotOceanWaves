@@ -94,14 +94,15 @@ func _render_imgui() -> void:
 			var params : WaveCascadeParameters = water.parameters[i]
 			if ImGui.BeginTabItem('Cascade %d' % (i + 1)):
 				imgui_text_tooltip('Tile Length:       ', 'Denotes the distance the cascade\'s tile should cover (in meters).'); ImGui.SameLine(); if ImGui.InputFloat2('##tile_length', params._tile_length): params.tile_length = Vector2(params._tile_length[0], params._tile_length[1])
-				imgui_text_tooltip('Time Scale:        ', ''); ImGui.SameLine(); if ImGui.SliderFloat('##time_scale', params._time_scale, 0, 2): params.time_scale = params._time_scale[0]
+				imgui_text_tooltip('Displacement Scale:', ''); ImGui.SameLine(); if ImGui.SliderFloat('##displacement_scale', params._displacement_scale, 0, 2): params.displacement_scale = params._displacement_scale[0]
+				imgui_text_tooltip('Normal Scale:      ', ''); ImGui.SameLine(); if ImGui.SliderFloat('##normal_scale', params._normal_scale, 0, 2): params.normal_scale = params._normal_scale[0]
 				ImGui.Dummy(Vector2(0,0)); ImGui.Separator(); ImGui.Dummy(Vector2(0,0))
 				imgui_text_tooltip('Wind Speed:        ', 'Denotes the average wind speed above the water (in meters per second).\nIncreasing makes waves steeper and more \'chaotic\'.'); ImGui.SameLine(); if ImGui.DragFloat('##wind_speed', params._wind_speed): params.wind_speed = params._wind_speed[0]
 				imgui_text_tooltip('Wind Direction:    ', ''); ImGui.SameLine(); if ImGui.SliderAngle('##wind_direction', params._wind_direction): params.wind_direction = rad_to_deg(params._wind_direction[0])
 				imgui_text_tooltip('Fetch Length:      ', 'Denotes the distance from shoreline (in kilometers).\nIncreasing makes waves steeper, but reduces their \'choppiness\'.'); ImGui.SameLine(); if ImGui.DragFloat('##fetch_length', params._fetch_length): params.fetch_length = params._fetch_length[0]
 				imgui_text_tooltip('Swell:             ', 'Modifies waves to clump in a more elongated, parallel manner.'); ImGui.SameLine(); if ImGui.SliderFloat('##swell', params._swell, 0, 2): params.swell = params._swell[0]
-				imgui_text_tooltip('Detail:            ', 'Modifies the attenuation of high frequency waves.'); ImGui.SameLine(); if ImGui.SliderFloat('##detail', params._detail, 0, 1): params.detail = params._detail[0]
 				imgui_text_tooltip('Spread:            ', 'Modifies how much wind and swell affect the direction of the waves.'); ImGui.SameLine(); if ImGui.SliderFloat('##spread', params._spread, 0, 1): params.spread = params._spread[0]
+				imgui_text_tooltip('Detail:            ', 'Modifies the attenuation of high frequency waves.'); ImGui.SameLine(); if ImGui.SliderFloat('##detail', params._detail, 0, 1): params.detail = params._detail[0]
 				ImGui.Dummy(Vector2(0,0)); ImGui.Separator(); ImGui.Dummy(Vector2(0,0))
 				imgui_text_tooltip('Whitecap:          ', 'Modifies how steep a wave needs to be before foam can accumulate.'); ImGui.SameLine(); if ImGui.SliderFloat('##white_cap', params._whitecap, 0, 2): params.whitecap = params._whitecap[0]
 				imgui_text_tooltip('Foam Amount:       ', ''); ImGui.SameLine(); if ImGui.SliderFloat('##foam_amount', params._foam_amount, 0, 10): params.foam_amount = params._foam_amount[0]

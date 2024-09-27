@@ -1,11 +1,11 @@
-[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://5xqyddws6rt5"]
+[gd_resource type="ShaderMaterial" load_steps=2 format=4 uid="uid://5xqyddws6rt5"]
 
 [ext_resource type="Shader" path="res://assets/shaders/spatial/sea_spray_particle.gdshader" id="1_puvd8"]
 
 [resource]
 shader = ExtResource("1_puvd8")
-shader_parameter/num_particles = 27000
-shader_parameter/particle_scale = Vector3(30, 12, 30)
+shader_parameter/num_particles = 32768
+shader_parameter/particle_scale = Vector3(20, 8.5, 20)
 shader_parameter/lifetime = 3.0
 shader_parameter/lifetime_randomness = 0.25
-shader_parameter/map_scales = PackedVector2Array(0.0113636, 0.0113636, 0.0175439, 0.0175439)
+shader_parameter/map_scales = PackedVector4Array(0.0113636, 0.0113636, 1, 1, 0.0175439, 0.0175439, 0.75, 0.5, 0.0625, 0.0625, 0, 0.25)

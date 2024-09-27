@@ -1,11 +1,11 @@
-[gd_scene load_steps=23 format=3 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=24 format=3 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_skarq"]
 [ext_resource type="Script" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
 [ext_resource type="Script" path="res://assets/player/camera.gd" id="4_v2yip"]
-[ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/water/clipmap_high.obj" id="5_7ycjq"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="5_lt75t"]
+[ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/water/clipmap_high.obj" id="5_n61pp"]
 [ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
 [ext_resource type="Script" path="res://assets/water/water.gd" id="7_s0x5e"]
 [ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
@@ -43,28 +43,44 @@ adjustment_saturation = 1.5
 [sub_resource type="Resource" id="Resource_adqv5"]
 script = ExtResource("2_pw5n6")
 tile_length = Vector2(88, 88)
-time_scale = 1.0
+displacement_scale = 1.0
+normal_scale = 1.0
 wind_speed = 10.0
 wind_direction = 20.0
 fetch_length = 150.0
 swell = 0.8
-detail = 1.0
 spread = 0.2
+detail = 1.0
 whitecap = 0.5
 foam_amount = 8.0
 
 [sub_resource type="Resource" id="Resource_luhq0"]
 script = ExtResource("2_pw5n6")
 tile_length = Vector2(57, 57)
-time_scale = 1.0
+displacement_scale = 0.75
+normal_scale = 1.0
 wind_speed = 5.0
 wind_direction = 15.0
 fetch_length = 150.0
 swell = 0.8
-detail = 0.8
 spread = 0.4
+detail = 1.0
 whitecap = 0.5
 foam_amount = 0.0
+
+[sub_resource type="Resource" id="Resource_83u3u"]
+script = ExtResource("2_pw5n6")
+tile_length = Vector2(16, 16)
+displacement_scale = 0.0
+normal_scale = 0.25
+wind_speed = 20.0
+wind_direction = 20.0
+fetch_length = 550.0
+swell = 0.8
+spread = 0.4
+detail = 1.0
+whitecap = 0.25
+foam_amount = 3.0
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_k6xhe"]
 
@@ -94,7 +110,7 @@ script = ExtResource("1_skarq")
 environment = SubResource("Environment_icybu")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.948729, -0.0499753, 0.312116, -0.00840572, 0.983084, 0.18296, -0.31598, -0.176203, 0.93226, 0, 10, 0)
+transform = Transform3D(0.945601, -0.0516921, 0.321197, -0.00840572, 0.983084, 0.18296, -0.325221, -0.175707, 0.929171, 0, 10, 0)
 shadow_bias = 0.0
 shadow_normal_bias = 6.464
 shadow_opacity = 0.8
@@ -105,20 +121,20 @@ transform = Transform3D(-0.996195, -0.0151344, 0.0858316, 0, 0.984807, 0.173648,
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 2.18279e-11, 1.67638e-08, -1.25729e-08, 1, 8.17236e-08, -6.94767e-07, 0, 1, -3, 0, -28)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -25)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
-mesh = ExtResource("5_7ycjq")
+mesh = ExtResource("5_n61pp")
 skeleton = NodePath("")
 script = ExtResource("7_s0x5e")
-parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0")])
+parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0"), SubResource("Resource_83u3u")])
 
 [node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
-transform = Transform3D(15, -1.88592e-07, -1.04215e-05, 1.88592e-07, 15, 8.52651e-14, 1.04215e-05, -2.16293e-13, 15, 0, 0, 0)
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0, 0)
 material_override = SubResource("ShaderMaterial_ds3o1")
 cast_shadow = 0
-amount = 27000
+amount = 32768
 lifetime = 6.0
 process_material = ExtResource("9_skbf4")
 draw_pass_1 = SubResource("QuadMesh_06d3e")

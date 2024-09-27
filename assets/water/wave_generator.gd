@@ -100,12 +100,10 @@ func update(delta : float, parameters : Array[WaveCascadeParameters]) -> void:
 	# Update each cascade's parameters that rely on time delta
 	for i in len(parameters):
 		var params := parameters[i]
-		var cascade_delta := delta * params.time_scale
-		params.time += cascade_delta
-		#params.time = 20.0
+		params.time += delta
 		# Note: The constants are used to normalize parameters between 0 and 10.
-		params.foam_grow_rate = cascade_delta * params.foam_amount*7.5
-		params.foam_decay_rate = cascade_delta * maxf(0.5, 10.0 - params.foam_amount)*1.15
+		params.foam_grow_rate = delta * params.foam_amount*7.5
+		params.foam_decay_rate = delta * maxf(0.5, 10.0 - params.foam_amount)*1.15
 
 	pass_parameters = parameters
 	pass_num_cascades_remaining = len(parameters)
