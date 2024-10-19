@@ -71,6 +71,9 @@ func _init() -> void:
 func _ready() -> void:
 	RenderingServer.global_shader_parameter_set(&'water_color', water_color.srgb_to_linear())
 	RenderingServer.global_shader_parameter_set(&'foam_color', foam_color.srgb_to_linear())
+	
+	await get_tree().create_timer(0.5).timeout
+	_setup_compute_shader()
 
 func _process(delta : float) -> void:
 	# Update waves once every 1.0/updates_per_second.
@@ -99,6 +102,7 @@ func _setup_wave_generator() -> void:
 	RenderingServer.global_shader_parameter_set(&'displacements', displacement_maps)
 	RenderingServer.global_shader_parameter_set(&'normals', normal_maps)
 
+
 func _update_scales_uniform() -> void:
 	var map_scales : PackedVector4Array; map_scales.resize(len(parameters))
 	for i in len(parameters):
@@ -117,3 +121,101 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
 		displacement_maps.texture_rd_rid = RID()
 		normal_maps.texture_rd_rid = RID()
+		
+		
+		
+		
+var rd: RenderingDevice
+var compute_pipeline: RID
+var height_buffer: RID
+var height_uniform_set: RID
+
+func _setup_compute_shader():
+	if Engine.is_editor_hint():
+		return
+	
+	rd = RenderingServer.get_rendering_device()
+	var shader_file = load("res://assets/shaders/spatial/compute.glsl")
+
+	var shader_spirv = shader_file.get_spirv()
+	var shader = rd.shader_create_from_spirv(shader_spirv)
+	
+	# Create buffer for wave heights
+	var buffer_size = map_size * map_size * 4 # 4 bytes per float
+	height_buffer = rd.storage_buffer_create(buffer_size)
+	
+	# Create uniform for the storage buffer
+	var uniform_buffer = RDUniform.new()
+	uniform_buffer.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	uniform_buffer.binding = 1  # This should match the binding in your shader
+	uniform_buffer.add_id(height_buffer)
+
+	# Check if displacement_maps texture is valid
+	if displacement_maps and displacement_maps.texture_rd_rid.is_valid():
+		print("Displacement map is a valid Texture2DArray")
+		
+		# Create uniform for the displacement map texture
+		var uniform_texture = RDUniform.new()
+		uniform_texture.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+		uniform_texture.binding = 0  # This should match the binding in your shader
+		
+		# Create a sampler
+		var sampler_state = RDSamplerState.new()
+		sampler_state.min_filter = RenderingDevice.SAMPLER_FILTER_LINEAR
+		sampler_state.mag_filter = RenderingDevice.SAMPLER_FILTER_LINEAR
+		sampler_state.mip_filter = RenderingDevice.SAMPLER_FILTER_LINEAR
+		sampler_state.repeat_u = RenderingDevice.SAMPLER_REPEAT_MODE_CLAMP_TO_EDGE
+		sampler_state.repeat_v = RenderingDevice.SAMPLER_REPEAT_MODE_CLAMP_TO_EDGE
+		sampler_state.repeat_w = RenderingDevice.SAMPLER_REPEAT_MODE_CLAMP_TO_EDGE
+		var sampler = rd.sampler_create(sampler_state)
+		
+		# Add both the sampler and the texture to the uniform
+		uniform_texture.add_id(sampler)
+		uniform_texture.add_id(displacement_maps.texture_rd_rid)
+
+		# Create the uniform set
+		height_uniform_set = rd.uniform_set_create([uniform_texture, uniform_buffer], shader, 0)
+		if height_uniform_set.is_valid():
+			print("Uniform set created successfully")
+		else:
+			print("Failed to create uniform set")
+	else:
+		print("Warning: Displacement map is not valid. Uniform set creation skipped.")
+
+	# Create compute pipeline
+	compute_pipeline = rd.compute_pipeline_create(shader)
+
+	
+func get_height_at_point(point: Vector2) -> float:
+	if not displacement_maps or not displacement_maps.texture_rd_rid.is_valid():
+		return 0.0
+
+	var compute_list = rd.compute_list_begin()
+	rd.compute_list_bind_compute_pipeline(compute_list, compute_pipeline)
+	rd.compute_list_bind_uniform_set(compute_list, height_uniform_set, 0)
+	
+	# Add a fourth float (0.0) to make it 16 bytes total
+	var push_constant = PackedFloat32Array([point.x, point.y, float(map_size), 0.0])
+	rd.compute_list_set_push_constant(compute_list, push_constant.to_byte_array(), push_constant.size() * 4)
+	
+	rd.compute_list_dispatch(compute_list, map_size / 16, map_size / 16, 1)
+	rd.compute_list_end()
+
+	# Submit to GPU and wait for sync
+	rd.submit()
+	rd.sync()
+
+	# Read back the result
+	var result = rd.buffer_get_data(height_buffer)
+	var height_array = result.to_float32_array()
+	
+	# Return the height at the center of the computed area
+	return height_array[height_array.size() / 2]
+
+
+func _exit_tree():
+	# ... (keep your existing cleanup code)
+	RenderingServer.free_rid(compute_pipeline)
+	RenderingServer.free_rid(height_buffer)
+	RenderingServer.free_rid(height_uniform_set)
+	
