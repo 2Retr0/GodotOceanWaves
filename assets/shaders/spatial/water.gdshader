@@ -42,7 +42,7 @@ void vertex() {
 vec4 cubic_weights(float a) {
 	float a2 = a*a;
 	float a3 = a2*a;
-	
+
 	float w0 =-a3     + a2*3.0 - a*3.0 + 1.0;
 	float w1 = a3*3.0 - a2*6.0         + 4.0;
 	float w2 =-a3*3.0 + a2*3.0 + a*3.0 + 1.0;
@@ -56,7 +56,7 @@ vec4 texture_bicubic(in sampler2DArray sampler, in vec3 uvw) {
 	vec2 dims = vec2(textureSize(sampler, 0).xy);
 	vec2 dims_inv = 1.0 / dims;
 	uvw.xy = uvw.xy*dims + 0.5;
-	
+
 	vec2 fuv = fract(uvw.xy);
 	vec4 wx = cubic_weights(fuv.x);
 	vec4 wy = cubic_weights(fuv.y);
@@ -66,7 +66,7 @@ vec4 texture_bicubic(in sampler2DArray sampler, in vec3 uvw) {
 	vec2 w = g.xz / (g.xz + g.yw);
     return mix(
 		mix(texture(sampler, vec3(h.yw, uvw.z)), texture(sampler, vec3(h.xw, uvw.z)), w.x),
-		mix(texture(sampler, vec3(h.yz, uvw.z)), texture(sampler, vec3(h.xz, uvw.z)), w.x), w.y); 
+		mix(texture(sampler, vec3(h.yz, uvw.z)), texture(sampler, vec3(h.xz, uvw.z)), w.x), w.y);
 }
 
 void fragment() {
@@ -82,7 +82,7 @@ void fragment() {
 		// This is dependent on the tile size as well as displacement/normal map resolution.
 		gradient += mix(texture_bicubic(normals, coords), texture(normals, coords), min(1.0, ppm*0.1)).xyw * vec3(scales.ww, 1.0);
 	}
-		
+
 	foam_factor = smoothstep(0.0, 1.0, gradient.z*0.75) * exp(-dist*0.0075);
 	ALBEDO = mix(water_color.rgb, foam_color.rgb, foam_factor);
 
