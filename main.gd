@@ -30,11 +30,6 @@ func _process(delta : float) -> void:
 		camera.enable_camera_movement = not (ImGui.IsWindowHovered(ImGui.HoveredFlags_AnyWindow) or ImGui.IsAnyItemActive())
 
 func _physics_process(delta: float) -> void:
-	# Shift water mesh whenever player moves into a new tile.
-	var tile := (Vector3(camera.global_position.x, 0.0, camera.global_position.z) / clipmap_tile_size).ceil()
-	if not tile.is_equal_approx(previous_tile):
-		water.global_position = tile * clipmap_tile_size
-		previous_tile = tile
 
 	# Vary audio samples based on total wind speed across all cascades.
 	var total_wind_speed := 0.0
