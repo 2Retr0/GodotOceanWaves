@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WaveCascadeParameters" load_steps=2 format=3 uid="uid://cldutyq6lhrk6"]
 
-[ext_resource type="Script" uid="uid://dmyajin516u2j" path="res://assets/water/wave_cascade_parameters.gd" id="1_1kgpe"]
+[ext_resource type="Script" uid="uid://ba0u1wf0uqka8" path="res://water contents/wave_cascade_parameters.gd" id="1_1kgpe"]
 
 [resource]
 script = ExtResource("1_1kgpe")

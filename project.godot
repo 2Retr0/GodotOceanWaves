@@ -74,7 +74,7 @@ water_color={
 }
 foam_color={
 "type": "color",
-"value": Color(0, 0, 0, 1)
+"value": Color(0.491905, 0.406448, 0.342392, 1)
 }
 num_cascades={
 "type": "uint",

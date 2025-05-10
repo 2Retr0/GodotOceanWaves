@@ -1,0 +1,5 @@
+[gd_resource type="PlaneMesh" load_steps=0 format=3 uid="uid://cc872tj0aoixv"]
+
+[resource]
+subdivide_width = 500
+subdivide_depth = 500

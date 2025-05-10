@@ -1,20 +1,17 @@
-[gd_scene load_steps=30 format=4 uid="uid://dx4r13gqfh13"]
+[gd_scene load_steps=23 format=4 uid="uid://dx4r13gqfh13"]
 
 [ext_resource type="Script" uid="uid://bap0ysmcgyau1" path="res://main.gd" id="1_skarq"]
-[ext_resource type="Script" uid="uid://dmyajin516u2j" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
-[ext_resource type="Material" uid="uid://tbp1tusy28ek" path="res://water contents/mat_water.tres" id="4_2cqfq"]
+[ext_resource type="Material" uid="uid://tbp1tusy28ek" path="res://water contents/new_mat_water.tres" id="4_2cqfq"]
 [ext_resource type="Script" uid="uid://br24gunyeqc8y" path="res://assets/player/camera.gd" id="4_v2yip"]
-[ext_resource type="PlaneMesh" uid="uid://cc872tj0aoixv" path="res://water contents/mesh.tres" id="5_2cqfq"]
+[ext_resource type="PlaneMesh" uid="uid://cc872tj0aoixv" path="res://water contents/new_water_mesh.tres" id="5_ycdy4"]
 [ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
-[ext_resource type="Script" uid="uid://xkf1sdf7lje" path="res://assets/water/water.gd" id="7_s0x5e"]
+[ext_resource type="Script" uid="uid://xkf1sdf7lje" path="res://water contents/water.gd" id="7_s0x5e"]
+[ext_resource type="Script" uid="uid://ba0u1wf0uqka8" path="res://water contents/wave_cascade_parameters.gd" id="7_w48qg"]
 [ext_resource type="Resource" uid="uid://cldutyq6lhrk6" path="res://water contents/WaveCascadeParams/WCP_1.tres" id="7_ycdy4"]
 [ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
-[ext_resource type="Shader" uid="uid://bqjnfa67oi6yh" path="res://assets/shaders/spatial/sea_spray.gdshader" id="8_eu8jb"]
 [ext_resource type="Resource" uid="uid://bnmlht3sirxc8" path="res://water contents/WaveCascadeParams/WCP_2.tres" id="8_vivmo"]
 [ext_resource type="Resource" uid="uid://byer8mpgkwtfj" path="res://water contents/WaveCascadeParams/WCP_3.tres" id="9_2cqfq"]
-[ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="9_skbf4"]
-[ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
 [ext_resource type="Shader" uid="uid://b7nu2lg4htwj5" path="res://assets/shaders/spatial/mask.gdshader" id="13_ycdy4"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_t7jwl"]
@@ -43,21 +40,6 @@ adjustment_enabled = true
 adjustment_brightness = 0.85
 adjustment_contrast = 1.07
 adjustment_saturation = 1.5
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_k6xhe"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_dg77c"]
-seamless = true
-noise = SubResource("FastNoiseLite_k6xhe")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ds3o1"]
-render_priority = 0
-shader = ExtResource("8_eu8jb")
-shader_parameter/max_alpha = 0.666
-shader_parameter/albedo_texture = ExtResource("10_spqpo")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_dg77c")
-
-[sub_resource type="QuadMesh" id="QuadMesh_06d3e"]
 
 [sub_resource type="FogMaterial" id="FogMaterial_riff4"]
 density = 8.0
@@ -132,19 +114,10 @@ extra_cull_margin = 1000.0
 visibility_range_end = 500.0
 visibility_range_end_margin = 10.0
 visibility_range_fade_mode = 1
-mesh = ExtResource("5_2cqfq")
+mesh = ExtResource("5_ycdy4")
 skeleton = NodePath("")
 script = ExtResource("7_s0x5e")
-parameters = Array[ExtResource("2_pw5n6")]([ExtResource("7_ycdy4"), ExtResource("8_vivmo"), ExtResource("9_2cqfq")])
-
-[node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
-transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0, 0)
-material_override = SubResource("ShaderMaterial_ds3o1")
-cast_shadow = 0
-amount = 32768
-lifetime = 6.0
-process_material = ExtResource("9_skbf4")
-draw_pass_1 = SubResource("QuadMesh_06d3e")
+parameters = Array[ExtResource("7_w48qg")]([ExtResource("7_ycdy4"), ExtResource("8_vivmo"), ExtResource("9_2cqfq")])
 
 [node name="FogVolume" type="FogVolume" parent="."]
 shape = 4
@@ -161,11 +134,11 @@ volume_db = -30.0
 autoplay = true
 
 [node name="Cube" type="MeshInstance3D" parent="."]
-transform = Transform3D(3.49478, 0, 0, 0, 3.49478, 0, 0, 0, 3.49478, 0, 0.593211, 0)
+transform = Transform3D(3.49478, 0, 0, 0, 3.49478, 0, 0, 0, 3.49478, 0, 0.977863, 0)
 mesh = SubResource("ArrayMesh_efxa6")
 skeleton = NodePath("")
 
 [node name="Mask" type="MeshInstance3D" parent="."]
-transform = Transform3D(6.50217, 0, 0, 0, 6.50217, 0, 0, 0, 6.50217, 0, 0.503079, 0)
+transform = Transform3D(6.50217, 0, 0, 0, 6.50217, 0, 0, 0, 6.50217, 0, 0.887731, 0)
 material_override = SubResource("ShaderMaterial_dg77c")
 mesh = SubResource("BoxMesh_ycdy4")
