@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WaveCascadeParameters" load_steps=2 format=3 uid="uid://cldutyq6lhrk6"]
+
+[ext_resource type="Script" uid="uid://dmyajin516u2j" path="res://assets/water/wave_cascade_parameters.gd" id="1_1kgpe"]
+
+[resource]
+script = ExtResource("1_1kgpe")
+tile_length = Vector2(88, 88)
+displacement_scale = 1.0
+normal_scale = 1.0
+wind_speed = 10.0
+wind_direction = 20.0
+fetch_length = 150.0
+swell = 0.8
+spread = 0.2
+detail = 1.0
+whitecap = 0.5
+foam_amount = 8.0

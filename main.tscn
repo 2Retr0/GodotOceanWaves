@@ -3,12 +3,16 @@
 [ext_resource type="Script" uid="uid://bap0ysmcgyau1" path="res://main.gd" id="1_skarq"]
 [ext_resource type="Script" uid="uid://dmyajin516u2j" path="res://assets/water/wave_cascade_parameters.gd" id="2_pw5n6"]
 [ext_resource type="Texture2D" uid="uid://cnft723bala47" path="res://assets/skybox.png" id="3_0ksgj"]
+[ext_resource type="Material" uid="uid://tbp1tusy28ek" path="res://water contents/mat_water.tres" id="4_2cqfq"]
 [ext_resource type="Script" uid="uid://br24gunyeqc8y" path="res://assets/player/camera.gd" id="4_v2yip"]
-[ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="5_lt75t"]
+[ext_resource type="PlaneMesh" uid="uid://cc872tj0aoixv" path="res://water contents/mesh.tres" id="5_2cqfq"]
 [ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="6_jpklm"]
 [ext_resource type="Script" uid="uid://xkf1sdf7lje" path="res://assets/water/water.gd" id="7_s0x5e"]
+[ext_resource type="Resource" uid="uid://cldutyq6lhrk6" path="res://water contents/WaveCascadeParams/WCP_1.tres" id="7_ycdy4"]
 [ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="8_6r5si"]
 [ext_resource type="Shader" uid="uid://bqjnfa67oi6yh" path="res://assets/shaders/spatial/sea_spray.gdshader" id="8_eu8jb"]
+[ext_resource type="Resource" uid="uid://bnmlht3sirxc8" path="res://water contents/WaveCascadeParams/WCP_2.tres" id="8_vivmo"]
+[ext_resource type="Resource" uid="uid://byer8mpgkwtfj" path="res://water contents/WaveCascadeParams/WCP_3.tres" id="9_2cqfq"]
 [ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="9_skbf4"]
 [ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="10_spqpo"]
 [ext_resource type="Shader" uid="uid://b7nu2lg4htwj5" path="res://assets/shaders/spatial/mask.gdshader" id="13_ycdy4"]
@@ -40,55 +44,9 @@ adjustment_brightness = 0.85
 adjustment_contrast = 1.07
 adjustment_saturation = 1.5
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_dg77c"]
-subdivide_width = 500
-subdivide_depth = 500
-
-[sub_resource type="Resource" id="Resource_adqv5"]
-script = ExtResource("2_pw5n6")
-tile_length = Vector2(88, 88)
-displacement_scale = 1.0
-normal_scale = 1.0
-wind_speed = 10.0
-wind_direction = 20.0
-fetch_length = 150.0
-swell = 0.8
-spread = 0.2
-detail = 1.0
-whitecap = 0.5
-foam_amount = 8.0
-
-[sub_resource type="Resource" id="Resource_luhq0"]
-script = ExtResource("2_pw5n6")
-tile_length = Vector2(57, 57)
-displacement_scale = 0.75
-normal_scale = 1.0
-wind_speed = 5.0
-wind_direction = 15.0
-fetch_length = 150.0
-swell = 0.8
-spread = 0.4
-detail = 1.0
-whitecap = 0.5
-foam_amount = 0.0
-
-[sub_resource type="Resource" id="Resource_83u3u"]
-script = ExtResource("2_pw5n6")
-tile_length = Vector2(16, 16)
-displacement_scale = 0.0
-normal_scale = 0.25
-wind_speed = 20.0
-wind_direction = 20.0
-fetch_length = 550.0
-swell = 0.8
-spread = 0.4
-detail = 1.0
-whitecap = 0.25
-foam_amount = 3.0
-
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_k6xhe"]
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tsx6q"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_dg77c"]
 seamless = true
 noise = SubResource("FastNoiseLite_k6xhe")
 
@@ -97,7 +55,7 @@ render_priority = 0
 shader = ExtResource("8_eu8jb")
 shader_parameter/max_alpha = 0.666
 shader_parameter/albedo_texture = ExtResource("10_spqpo")
-shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_tsx6q")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_dg77c")
 
 [sub_resource type="QuadMesh" id="QuadMesh_06d3e"]
 
@@ -167,17 +125,17 @@ script = ExtResource("4_v2yip")
 [node name="Water" type="MeshInstance3D" parent="."]
 transform = Transform3D(45.8689, 0, 0, 0, 1, 0, 0, 0, 28.7451, 4, 0, -5)
 sorting_offset = 999.0
-material_override = ExtResource("5_lt75t")
+material_override = ExtResource("4_2cqfq")
 transparency = 0.01
 cast_shadow = 0
 extra_cull_margin = 1000.0
-visibility_range_end = 100.0
+visibility_range_end = 500.0
 visibility_range_end_margin = 10.0
 visibility_range_fade_mode = 1
-mesh = SubResource("PlaneMesh_dg77c")
+mesh = ExtResource("5_2cqfq")
 skeleton = NodePath("")
 script = ExtResource("7_s0x5e")
-parameters = Array[ExtResource("2_pw5n6")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0"), SubResource("Resource_83u3u")])
+parameters = Array[ExtResource("2_pw5n6")]([ExtResource("7_ycdy4"), ExtResource("8_vivmo"), ExtResource("9_2cqfq")])
 
 [node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
 transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0, 0)
