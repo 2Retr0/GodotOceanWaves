@@ -35,7 +35,7 @@ window/show_image=false
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/SunshineClouds2/plugin.cfg", "res://addons/anthonyec.camera_preview/plugin.cfg")
+enabled=PackedStringArray("res://addons/anthonyec.camera_preview/plugin.cfg")
 
 [input]
 

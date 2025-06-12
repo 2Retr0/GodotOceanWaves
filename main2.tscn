@@ -1,6 +1,5 @@
 [gd_scene load_steps=25 format=3 uid="uid://7hp8nd7fwaar"]
 
-[ext_resource type="CompositorEffect" uid="uid://dwrkdh8i18t7v" path="res://NewCloudsGD.tres" id="1_hi5em"]
 [ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="2_bbj40"]
 [ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/water/clipmap_high.obj" id="3_4fcfw"]
 [ext_resource type="Script" uid="uid://xkf1sdf7lje" path="res://assets/water/water.gd" id="4_pw2xv"]
@@ -28,9 +27,6 @@ ssao_power = 4.70751
 glow_enabled = true
 volumetric_fog_density = 0.0069
 volumetric_fog_anisotropy = 0.9
-
-[sub_resource type="Compositor" id="Compositor_dg77c"]
-compositor_effects = Array[CompositorEffect]([ExtResource("1_hi5em")])
 
 [sub_resource type="Resource" id="Resource_adqv5"]
 script = ExtResource("5_0v28x")
@@ -156,63 +152,3 @@ autoplay = true
 [node name="Sprite3D" type="Sprite3D" parent="Logo"]
 transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.508)
 texture = SubResource("CompressedTexture2D_hi5em")
-
-[node name="Sprite3D2" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.538)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D3" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.568)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D4" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.598)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D5" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.6187)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D6" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.6486)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D7" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.6786)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D8" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7086)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D9" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.7293)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D10" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7593)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D11" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7893)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D12" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8193)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D13" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.8399)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D14" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8699)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D15" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8999)
-texture = ExtResource("11_0wsoa")
-
-[node name="Sprite3D16" type="Sprite3D" parent="Logo"]
-transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.9299)
-texture = ExtResource("11_0wsoa")
