@@ -1,0 +1,218 @@
+[gd_scene load_steps=25 format=3 uid="uid://7hp8nd7fwaar"]
+
+[ext_resource type="CompositorEffect" uid="uid://dwrkdh8i18t7v" path="res://NewCloudsGD.tres" id="1_hi5em"]
+[ext_resource type="Material" uid="uid://byumtcccq4ew3" path="res://assets/water/mat_water.tres" id="2_bbj40"]
+[ext_resource type="ArrayMesh" uid="uid://ix4vp1y05f1s" path="res://assets/water/clipmap_high.obj" id="3_4fcfw"]
+[ext_resource type="Script" uid="uid://xkf1sdf7lje" path="res://assets/water/water.gd" id="4_pw2xv"]
+[ext_resource type="Script" uid="uid://dmyajin516u2j" path="res://assets/water/wave_cascade_parameters.gd" id="5_0v28x"]
+[ext_resource type="Shader" uid="uid://bqjnfa67oi6yh" path="res://assets/shaders/spatial/sea_spray.gdshader" id="6_r462f"]
+[ext_resource type="Texture2D" uid="uid://dtm5tyuh2slqt" path="res://assets/water/sea_spray.png" id="7_ygvo0"]
+[ext_resource type="Material" uid="uid://5xqyddws6rt5" path="res://assets/water/mat_spray.tres" id="8_fmrym"]
+[ext_resource type="AudioStream" uid="uid://cvvn0vke5comw" path="res://assets/ocean_loop.wav" id="9_3l0ko"]
+[ext_resource type="AudioStream" uid="uid://ck6vmandgjhy0" path="res://assets/wind_loop.wav" id="10_og1cw"]
+[ext_resource type="Texture2D" uid="uid://d3nk0ux11pdyv" path="res://Subnautica_logo.png" id="11_0wsoa"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_efxa6"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_dg77c"]
+sky_material = SubResource("ProceduralSkyMaterial_efxa6")
+
+[sub_resource type="Environment" id="Environment_ycdy4"]
+background_mode = 2
+sky = SubResource("Sky_dg77c")
+tonemap_mode = 2
+ssao_intensity = 16.0
+ssao_power = 4.70751
+glow_enabled = true
+volumetric_fog_density = 0.0069
+volumetric_fog_anisotropy = 0.9
+
+[sub_resource type="Compositor" id="Compositor_dg77c"]
+compositor_effects = Array[CompositorEffect]([ExtResource("1_hi5em")])
+
+[sub_resource type="Resource" id="Resource_adqv5"]
+script = ExtResource("5_0v28x")
+tile_length = Vector2(88, 88)
+displacement_scale = 0.0
+normal_scale = 1.0
+wind_speed = 10.0
+wind_direction = 20.0
+fetch_length = 150.0
+swell = 0.8
+spread = 0.2
+detail = 1.0
+whitecap = 0.5
+foam_amount = 0.0
+
+[sub_resource type="Resource" id="Resource_luhq0"]
+script = ExtResource("5_0v28x")
+tile_length = Vector2(50, 50)
+displacement_scale = 0.688
+normal_scale = 1.0
+wind_speed = 1.76
+wind_direction = -59.99
+fetch_length = 150.0
+swell = 2.0
+spread = 0.4
+detail = 1.0
+whitecap = 0.0
+foam_amount = 0.0
+
+[sub_resource type="Resource" id="Resource_83u3u"]
+script = ExtResource("5_0v28x")
+tile_length = Vector2(16, 16)
+displacement_scale = 0.0
+normal_scale = 0.25
+wind_speed = 20.0
+wind_direction = 20.0
+fetch_length = 550.0
+swell = 0.8
+spread = 0.4
+detail = 1.0
+whitecap = 0.254
+foam_amount = 6.769
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_k6xhe"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_tsx6q"]
+seamless = true
+noise = SubResource("FastNoiseLite_k6xhe")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ds3o1"]
+render_priority = 0
+shader = ExtResource("6_r462f")
+shader_parameter/max_alpha = 0.666
+shader_parameter/albedo_texture = ExtResource("7_ygvo0")
+shader_parameter/dissolve_texture = SubResource("NoiseTexture2D_tsx6q")
+
+[sub_resource type="QuadMesh" id="QuadMesh_06d3e"]
+
+[sub_resource type="FogMaterial" id="FogMaterial_riff4"]
+density = 8.0
+albedo = Color(0.988718, 0.989631, 0.989629, 1)
+height_falloff = 0.176
+edge_fade = 1.75
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hi5em"]
+load_path = "res://.godot/imported/Subnautica_logo.png-f85ffce5e4b744c4e3b2cc59bab74fb5.s3tc.ctex"
+
+[node name="Main" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.989445, 0.144909, 0, -0.144909, 0.989445, 0, 1.90609, 4.3704)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ycdy4")
+compositor = SubResource("Compositor_dg77c")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.851736, -0.214618, 0.478001, -0.104447, 0.9635, 0.246491, -0.513456, 0.160019, -0.843064, 0, 0, 0)
+light_color = Color(1, 0.81949, 0.561154, 1)
+light_energy = 2.333
+shadow_enabled = true
+directional_shadow_max_distance = 1.0
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -5)
+sorting_offset = 999.0
+material_override = ExtResource("2_bbj40")
+cast_shadow = 0
+extra_cull_margin = 1000.0
+mesh = ExtResource("3_4fcfw")
+skeleton = NodePath("")
+script = ExtResource("4_pw2xv")
+water_color = Color(0.0387309, 0.159507, 0.19337, 1)
+parameters = Array[ExtResource("5_0v28x")]([SubResource("Resource_adqv5"), SubResource("Resource_luhq0"), SubResource("Resource_83u3u")])
+map_size = 512
+updates_per_second = 60.0
+
+[node name="WaterSprayEmitter" type="GPUParticles3D" parent="Water"]
+transform = Transform3D(15, 0, 0, 0, 15, 0, 0, 0, 15, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_ds3o1")
+cast_shadow = 0
+amount = 32768
+lifetime = 6.0
+process_material = ExtResource("8_fmrym")
+draw_pass_1 = SubResource("QuadMesh_06d3e")
+
+[node name="FogVolume" type="FogVolume" parent="."]
+shape = 4
+material = SubResource("FogMaterial_riff4")
+
+[node name="OceanAudioPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_3l0ko")
+volume_db = 15.0
+autoplay = true
+
+[node name="WindAudioPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_og1cw")
+volume_db = -30.0
+autoplay = true
+
+[node name="Logo" type="Node3D" parent="."]
+
+[node name="Sprite3D" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.508)
+texture = SubResource("CompressedTexture2D_hi5em")
+
+[node name="Sprite3D2" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.538)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D3" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.568)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D4" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.598)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D5" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.6187)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D6" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.6486)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D7" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.6786)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D8" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7086)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D9" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.7293)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D10" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7593)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D11" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.7893)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D12" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8193)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D13" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.30487, -10.8399)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D14" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8699)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D15" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.8999)
+texture = ExtResource("11_0wsoa")
+
+[node name="Sprite3D16" type="Sprite3D" parent="Logo"]
+transform = Transform3D(2.37631, 0, 0, 0, 2.37631, 0, 0, 0, 2.37631, 0, 1.305, -10.9299)
+texture = ExtResource("11_0wsoa")

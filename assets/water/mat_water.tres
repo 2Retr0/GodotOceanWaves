@@ -5,6 +5,6 @@
 [resource]
 render_priority = 1
 shader = ExtResource("1_uffek")
-shader_parameter/roughness = 0.65
-shader_parameter/normal_strength = 1.0
-shader_parameter/map_scales = PackedVector4Array(0.0113636, 0.0113636, 1, 1, 0.0175439, 0.0175439, 0.75, 1, 0.0625, 0.0625, 0, 0.25)
+shader_parameter/roughness = 0.056
+shader_parameter/normal_strength = 0.782
+shader_parameter/map_scales = PackedVector4Array(0.0113636, 0.0113636, 0, 1, 0.0175439, 0.0175439, 0.688, 1, 0.0625, 0.0625, 0, 0.25)
