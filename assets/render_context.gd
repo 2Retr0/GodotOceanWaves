@@ -84,6 +84,9 @@ func create_texture(dimensions : Vector2i, format : RenderingDevice.DataFormat, 
 	texture_format.usage_bits = usage # Default: RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT | RenderingDevice.TEXTURE_USAGE_COLOR_ATTACHMENT_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 	return Descriptor.new(deletion_queue.push(device.texture_create(texture_format, view, data)), RenderingDevice.UNIFORM_TYPE_IMAGE)
 
+func create_texture_descriptor(texture_rid : RID, uniform_type : RenderingDevice.UniformType) -> Descriptor:
+	return Descriptor.new(texture_rid, uniform_type)
+
 ## Creates a descriptor set. The ordering of the provided descriptors matches the binding ordering
 ## within the shader.
 func create_descriptor_set(descriptors : Array[Descriptor], shader : RID, descriptor_set_index :=0) -> RID:
