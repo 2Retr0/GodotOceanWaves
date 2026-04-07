@@ -121,10 +121,11 @@ transform = Transform3D(-0.996195, -0.0151344, 0.0858316, 0, 0.984807, 0.173648,
 script = ExtResource("4_v2yip")
 
 [node name="Water" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, -25)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 0, -11)
 sorting_offset = 999.0
 material_override = ExtResource("5_lt75t")
 cast_shadow = 0
+extra_cull_margin = 100.0
 mesh = ExtResource("5_n61pp")
 skeleton = NodePath("")
 script = ExtResource("7_s0x5e")
