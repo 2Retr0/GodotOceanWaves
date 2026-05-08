@@ -1,0 +1,10 @@
+version: '3'
+
+tasks:
+  lint:
+    cmds:
+      - task: lint-gdscript
+
+  lint-gdscript:
+    cmds:
+      - which gdlint 2>/dev/null && gdlint $(find . -name "*.gd" -not -path "*/addons/*") || echo "gdlint not available, skipping"

@@ -15,7 +15,7 @@
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 
-layout(rgba16f, set = 0, binding = 0) restrict readonly uniform image2DArray spectrum;
+layout(rgba32f, set = 0, binding = 0) restrict uniform image2DArray spectrum;
 
 layout(std430, set = 1, binding = 0) restrict writeonly buffer FFTBuffer {
 	vec2 data[]; // map_size x map_size x num_spectra x 2 * num_cascades
